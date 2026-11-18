@@ -1,0 +1,11 @@
+---
+import Layout from "../layouts/Layout.astro";
+import VideoShowcaseSection from "../components/belajar/VideoShowcaseSection.astro";
+import NewsFeedSection from "../components/belajar/NewsFeedSection.astro";
+import { siteContent } from "../data/content";
+---
+
+<Layout title={`Belajar & Kasus Nyata — ${siteContent.brand}`}>
+  <VideoShowcaseSection />
+  <NewsFeedSection />
+</Layout>

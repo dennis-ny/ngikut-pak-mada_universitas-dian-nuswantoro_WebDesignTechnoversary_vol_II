@@ -1,0 +1,108 @@
+name: news-snapshot
+
+on:
+  schedule:
+    - cron: "17 23 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry-run: fetch + klasifikasi saja, tanpa export/commit/deploy"
+        type: boolean
+        default: false
+
+concurrency:
+  group: news-snapshot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      snapshot_changed: ${{ steps.commit_step.outputs.changed }}
+    env:
+      ASHEN_NEWS_CONTACT: ${{ secrets.ASHEN_NEWS_CONTACT || 'https://ashen3d.web.id' }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: services/news-aggregator
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Pulihkan cache DB
+        uses: actions/cache@v4
+        with:
+          path: services/news-aggregator/data/news.db
+          key: news-db-${{ github.run_id }}
+          restore-keys: news-db-
+
+      - run: uv sync --frozen
+      - run: uv run pytest -q
+
+      - name: Seed DB dari snapshot bila cache hilang
+        run: uv run ashen-news seed
+
+      - name: Fetch RSS
+        run: |
+          set -o pipefail
+          if [ "$DRY_RUN" = "true" ]; then FLAGS="--dry-run"; else FLAGS=""; fi
+          uv run ashen-news fetch $FLAGS 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Health feed
+        continue-on-error: true
+        run: uv run ashen-news health 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Statistik
+        run: uv run ashen-news stats 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Export snapshot
+        if: env.DRY_RUN != 'true'
+        run: uv run ashen-news export
+
+      - uses: actions/setup-node@v4
+        if: env.DRY_RUN != 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verifikasi situs bisa di-build dengan snapshot baru
+        if: env.DRY_RUN != 'true'
+        working-directory: .
+        run: |
+          npm ci
+          npm run build
+
+      - name: Commit snapshot bila berubah
+        id: commit_step
+        if: env.DRY_RUN != 'true'
+        working-directory: .
+        run: |
+          git config user.name "ashen-news-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/generated/news.json
+          if git diff --cached --quiet; then
+            echo "Snapshot tidak berubah."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore(news): update snapshot"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    needs: update
+    if: needs.update.outputs.snapshot_changed == 'true'
+    runs-on: self-hosted
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository terbaru
+        uses: actions/checkout@v4
+
+      - name: Rebuild container production dengan berita baru
+        run: docker compose -f compose.prod.yaml up -d --build --remove-orphans

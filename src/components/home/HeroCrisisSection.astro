@@ -1,0 +1,306 @@
+---
+import { homeContent } from "../../data/content";
+
+const { hero } = homeContent;
+---
+
+<section class="hero-crisis parallax-window">
+  <div class="hero-bg-wrap" aria-hidden="true">
+    <img
+      src={hero.image}
+      alt="Kebakaran Hutan Indonesia"
+      class="hero-bg-img parallax-media"
+      data-parallax="0.26"
+      fetchpriority="high"
+      decoding="async"
+    />
+    <div class="hero-overlay"></div>
+  </div>
+
+  <div class="hero-center-stack" data-reveal>
+    <div class="hero-eyebrow">
+      <span class="eyebrow-text font-display">{hero.eyebrow}</span>
+    </div>
+
+    <h1 class="hero-stack-heading font-display">
+      <span class="stack-top">{hero.headlineTop}</span>
+      <span class="stack-metric">{hero.headlineMetric}</span>
+    </h1>
+
+    <p class="hero-paragraph">{hero.description}</p>
+
+    <div class="hero-actions">
+      <a href={hero.primaryCta.href} class="hero-btn-highlight">
+        <span>{hero.primaryCta.label}</span>
+        <span class="btn-circle" aria-hidden="true">
+          <svg class="btn-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 7H11.5M11.5 7L7.5 3M11.5 7L7.5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </a>
+      <a href={hero.secondaryCta.href} class="hero-btn-secondary">
+        <span>{hero.secondaryCta.label}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-crisis {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 112px 24px 80px;
+    background-color: var(--color-fire-bg);
+    text-align: center;
+  }
+
+  .hero-bg-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .hero-bg-img {
+    width: 100%;
+    height: 136%;
+    object-fit: cover;
+    object-position: center 35%;
+    position: absolute;
+    top: -18%;
+    left: 0;
+    transform: translate3d(0, 0, 0) scale(1.12);
+    will-change: transform;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(24, 18, 14, 0.16) 0%,
+      rgba(24, 18, 14, 0.28) 52%,
+      rgba(24, 18, 14, 0.85) 86%,
+      #18120e 100%
+    );
+  }
+
+  .hero-center-stack {
+    position: relative;
+    z-index: 2;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-charcoal);
+    margin-bottom: 12px;
+  }
+
+  .eyebrow-text {
+    font-size: clamp(20px, 1.5vw, 22px);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+
+  .hero-stack-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .stack-top {
+    font-size: clamp(60px, 9.6vw, 134px);
+    font-weight: 700;
+    line-height: 0.86;
+    color: #ffffff;
+    letter-spacing: 0;
+  }
+
+  .stack-metric {
+    font-size: clamp(60px, 9.6vw, 134px);
+    font-weight: 700;
+    line-height: 0.86;
+    color: var(--color-ember);
+    margin-top: -0.03em;
+  }
+
+  .hero-paragraph {
+    font-family: var(--font-sans);
+    font-size: clamp(14px, 1.15vw, 16.5px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: rgba(252, 246, 236, 0.9);
+    max-width: 500px;
+    margin-bottom: 28px;
+    text-shadow: 0 1px 10px rgba(24, 18, 14, 0.45);
+  }
+
+  .hero-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero-btn-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    height: 44px;
+    padding: 4px 4px 4px 20px;
+    border-radius: 9999px;
+    background-color: var(--color-cream);
+    border: 1px solid rgba(46, 37, 33, 0.2);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .hero-btn-highlight .btn-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--color-charcoal);
+    color: var(--color-cream);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  .hero-btn-highlight .btn-arrow {
+    transition: transform 0.25s ease;
+  }
+
+  .hero-btn-highlight:hover {
+    background-color: var(--color-charcoal);
+    border-color: rgba(252, 246, 236, 0.28);
+    color: var(--color-cream);
+  }
+
+  .hero-btn-highlight:hover .btn-circle {
+    background-color: var(--color-cream);
+    color: var(--color-charcoal);
+  }
+
+  .hero-btn-highlight:hover .btn-arrow {
+    transform: translateX(2px);
+  }
+
+  .hero-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 9999px;
+    background-color: rgba(46, 37, 33, 0.65);
+    border: 1px solid rgba(252, 246, 236, 0.28);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .hero-btn-secondary:hover {
+    background-color: rgba(46, 37, 33, 0.9);
+    border-color: rgba(252, 246, 236, 0.6);
+  }
+
+  @media (max-width: 1024px) {
+    .hero-crisis {
+      padding: 104px 32px 72px;
+    }
+
+    .stack-top,
+    .stack-metric {
+      font-size: clamp(92px, 14.5vw, 126px);
+    }
+
+    .hero-paragraph {
+      font-size: 15px;
+      max-width: 440px;
+      margin-bottom: 26px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-crisis {
+      min-height: 100svh;
+      padding: 92px 20px 64px;
+    }
+
+    .hero-eyebrow {
+      margin-bottom: 8px;
+    }
+
+    .eyebrow-text {
+      font-size: 17px;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-stack-heading {
+      margin-bottom: 16px;
+    }
+
+    .stack-top,
+    .stack-metric {
+      font-size: clamp(78px, 22.5vw, 104px);
+      line-height: 0.85;
+    }
+
+    .hero-paragraph {
+      font-size: 13px;
+      line-height: 1.48;
+      color: rgba(252, 246, 236, 0.82);
+      max-width: 310px;
+      margin-bottom: 22px;
+    }
+
+    .hero-actions {
+      gap: 10px;
+      width: 100%;
+    }
+
+    .hero-btn-highlight {
+      height: 42px;
+      padding: 4px 4px 4px 18px;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .hero-btn-highlight .btn-circle {
+      width: 32px;
+      height: 32px;
+    }
+
+    .hero-btn-secondary {
+      height: 42px;
+      padding: 0 22px;
+      font-size: 13px;
+    }
+  }
+</style>

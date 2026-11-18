@@ -1,0 +1,364 @@
+---
+import { homeContent } from "../../data/content";
+
+const { natureStory } = homeContent;
+const slides = natureStory.slides;
+---
+
+<section class="nature-story" id="nature-story" data-nav-theme="glass">
+  <div class="nature-sticky">
+    <div class="nature-bg-wrap" aria-hidden="true">
+      <img
+        src={natureStory.bgImage}
+        alt="Kanopi Hutan Tropis"
+        class="nature-bg-img"
+        id="nature-bg-img"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="nature-bg-lighting"></div>
+    </div>
+
+    <div class="nature-center-stage">
+      <div class="nature-headline-grid">
+        {slides.map((slide, idx) => (
+          <h2
+            class="nature-headline"
+            data-slide-idx={idx}
+            aria-hidden={idx === 0 ? undefined : "true"}
+          >
+            {slide.lines.map((line) => (
+              <span class="line-mask">
+                <span class="line-inner" data-line-group={idx}>{line}</span>
+              </span>
+            ))}
+          </h2>
+        ))}
+      </div>
+
+      <div class="nature-subcaption-wrap" aria-live="polite">
+        {slides.map((slide, idx) => (
+          <p
+            class:list={["nature-subcaption", { "is-active": idx === 0 }]}
+            data-subcaption-idx={idx}
+          >
+            {slide.cardText}
+          </p>
+        ))}
+      </div>
+    </div>
+
+    <div class="nature-step-indicator" aria-label="Tahap cerita alam">
+      {slides.map((_, idx) => (
+        <span
+          class:list={["nature-step-item font-mono", { "is-active": idx === 0 }]}
+          data-step-idx={idx}
+        >
+          0{idx + 1}
+        </span>
+      ))}
+    </div>
+
+    <div class="nature-dim-overlay" id="nature-dim-overlay" aria-hidden="true"></div>
+  </div>
+</section>
+
+<script>
+  const section = document.getElementById("nature-story");
+  const bgImg = document.getElementById("nature-bg-img");
+  const dimOverlay = document.getElementById("nature-dim-overlay");
+  const subcaptions = Array.from(document.querySelectorAll<HTMLElement>("[data-subcaption-idx]"));
+  const stepItems = Array.from(document.querySelectorAll<HTMLElement>("[data-step-idx]"));
+
+  const TOTAL_STEPS = 4;
+  const stepLines: NodeListOf<HTMLElement>[] = [];
+  for (let s = 0; s < TOTAL_STEPS; s++) {
+    stepLines.push(document.querySelectorAll<HTMLElement>(`[data-line-group="${s}"]`));
+  }
+
+  const clamp = (v: number, min = 0, max = 1) => Math.max(min, Math.min(max, v));
+  const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
+  let targetP = 0;
+  let currentP = 0;
+  let targetEntry = 1;
+  let currentEntry = 1;
+  let lastActiveIdx = 0;
+  let rafRunning = false;
+
+  function scheduleRender() {
+    if (!rafRunning) {
+      rafRunning = true;
+      requestAnimationFrame(renderNatureFrame);
+    }
+  }
+
+  function readScrollTarget() {
+    if (!section) return;
+    const rect = section.getBoundingClientRect();
+    const vh = Math.max(1, window.innerHeight);
+    const nextEntry = clamp(-rect.top / vh, 0, 1);
+    const storyScrollable = Math.max(1, section.offsetHeight - vh * 2);
+    const nextP = clamp((-rect.top - vh) / storyScrollable, 0, 1);
+
+    if (nextEntry !== targetEntry || nextP !== targetP) {
+      targetEntry = nextEntry;
+      targetP = nextP;
+      scheduleRender();
+    }
+  }
+
+  function renderNatureFrame() {
+    currentP += (targetP - currentP) * 0.14;
+    const pSettled = Math.abs(targetP - currentP) < 0.0001;
+    if (pSettled) {
+      currentP = targetP;
+    }
+    currentEntry += (targetEntry - currentEntry) * 0.14;
+    const entrySettled = Math.abs(targetEntry - currentEntry) < 0.0001;
+    if (entrySettled) {
+      currentEntry = targetEntry;
+    }
+
+    const p = currentP;
+    const e = smoothstep(currentEntry);
+
+    if (bgImg) {
+      const bgY = (1 - e) * 6 - p * 30;
+      const entryScaleOffset = (1 - e) * 0.08;
+      const bgScale = 1.14 + entryScaleOffset - p * 0.12;
+      const bgOpacity = 0.22 + e * 0.78;
+      bgImg.style.transform = `translate3d(0, ${bgY.toFixed(3)}%, 0) scale(${bgScale.toFixed(4)})`;
+      bgImg.style.opacity = `${bgOpacity.toFixed(3)}`;
+    }
+
+    const u = clamp((p - 0.06) / 0.64, 0, 1) * (TOTAL_STEPS - 1);
+
+    const activeIdx = Math.round(clamp(u, 0, TOTAL_STEPS - 1));
+    if (activeIdx !== lastActiveIdx) {
+      lastActiveIdx = activeIdx;
+      stepItems.forEach((el, idx) => el.classList.toggle("is-active", idx === activeIdx));
+    }
+
+    subcaptions.forEach((el, s) => {
+      const d = u - s;
+      let op = 1;
+      let y = 0;
+      if (s > 0 && d < -0.22) {
+        const t = smoothstep(clamp((d - -0.44) / 0.22, 0, 1));
+        op = t;
+        y = (1 - t) * 8;
+      } else if (s < TOTAL_STEPS - 1 && d > 0.22) {
+        const t = smoothstep(clamp((d - 0.22) / 0.22, 0, 1));
+        op = 1 - t;
+        y = -t * 8;
+      }
+      el.style.opacity = op.toFixed(3);
+      el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
+    });
+
+    for (let s = 0; s < TOTAL_STEPS; s++) {
+      const delta = u - s;
+      const lines = stepLines[s];
+
+      lines.forEach((el, lineIdx) => {
+        const stagger = lineIdx * 0.035;
+        const enterStart = -0.64 + stagger;
+        const enterEnd = -0.30 + stagger;
+        const exitStart = 0.30 + stagger;
+        const exitEnd = 0.64 + stagger;
+
+        let yPercent = 0;
+
+        if (delta < enterEnd) {
+          const rawEnter = clamp((delta - enterStart) / (enterEnd - enterStart), 0, 1);
+          yPercent = (1 - smoothstep(rawEnter)) * 125;
+        } else if (delta > exitStart) {
+          const rawExit = clamp((delta - exitStart) / (exitEnd - exitStart), 0, 1);
+          yPercent = -smoothstep(rawExit) * 125;
+        }
+
+        el.style.transform = `translate3d(0, ${yPercent}%, 0)`;
+      });
+    }
+
+    if (dimOverlay) {
+      const entryDim = (1 - e) * 0.85;
+      const exitDim = smoothstep(clamp((p - 0.76) / 0.24, 0, 1)) * 0.72;
+      const dim = Math.max(entryDim, exitDim);
+      dimOverlay.style.opacity = `${dim.toFixed(3)}`;
+    }
+
+    if (pSettled && entrySettled) {
+      rafRunning = false;
+      return;
+    }
+
+    requestAnimationFrame(renderNatureFrame);
+  }
+
+  window.addEventListener("scroll", readScrollTarget, { passive: true });
+  window.addEventListener("resize", readScrollTarget, { passive: true });
+  readScrollTarget();
+  currentP = targetP;
+  currentEntry = targetEntry;
+  scheduleRender();
+</script>
+
+<style>
+  .nature-story {
+    position: relative;
+    z-index: 1;
+    margin-top: -100vh;
+    height: 600vh;
+    background-color: #121110;
+    color: var(--color-cream);
+  }
+
+  .nature-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+
+  .nature-bg-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .nature-dim-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background-color: #121110;
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .nature-bg-img {
+    position: relative;
+    top: -8%;
+    width: 100%;
+    height: 144%;
+    object-fit: cover;
+    object-position: center;
+    will-change: transform;
+    transform: translate3d(0, 0, 0) scale(1.14);
+    filter: brightness(0.78) contrast(1.05) saturate(1.02);
+  }
+
+  /* Deep moody forest vignette for crisp headline contrast + warm corner sunlight glow */
+  .nature-bg-lighting {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 48%, rgba(12, 14, 10, 0.28) 0%, rgba(12, 14, 10, 0.08) 56%, transparent 82%),
+      radial-gradient(circle at 94% 92%, rgba(242, 212, 122, 0.3) 0%, rgba(208, 178, 92, 0.12) 22%, transparent 44%),
+      linear-gradient(180deg, rgba(16, 15, 14, 0.38) 0%, rgba(16, 15, 14, 0.12) 45%, rgba(16, 15, 14, 0.20) 100%);
+  }
+
+  /* Centered 3-Line Masked Headline Stage + Sub-caption */
+  .nature-center-stage {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 820px;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .nature-headline-grid {
+    width: 100%;
+    display: grid;
+    place-items: center;
+  }
+
+  .nature-headline {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    font-family: var(--font-sans);
+    font-size: clamp(32px, 4.5vw, 62px);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: -0.03em;
+    color: #ffffff;
+  }
+
+  .line-mask {
+    display: block;
+    overflow: hidden;
+    padding: 2px 8px 10px;
+  }
+
+  .line-mask:not(:last-child) {
+    margin-bottom: -11px;
+  }
+
+  .line-inner {
+    display: block;
+    will-change: transform;
+    transform: translate3d(0, 115%, 0);
+  }
+
+  /* Clean Editorial Sub-caption below 3-line headline */
+  .nature-subcaption-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    min-height: 48px;
+    margin-top: 24px;
+    display: grid;
+    place-items: center;
+  }
+
+  .nature-subcaption {
+    grid-area: 1 / 1;
+    font-family: var(--font-sans);
+    font-size: clamp(14px, 1.15vw, 16px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: rgba(252, 246, 236, 0.78);
+    opacity: 0;
+    will-change: opacity, transform;
+    pointer-events: none;
+  }
+
+  /* Minimal 01 - 04 Phase Indicator at Bottom */
+  .nature-step-indicator {
+    position: absolute;
+    bottom: clamp(24px, 4vh, 40px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .nature-step-item {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: rgba(252, 246, 236, 0.36);
+    padding-bottom: 4px;
+    border-bottom: 1.5px solid transparent;
+    transition: color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .nature-step-item.is-active {
+    color: var(--color-cream);
+    border-bottom-color: var(--color-cream);
+  }
+</style>

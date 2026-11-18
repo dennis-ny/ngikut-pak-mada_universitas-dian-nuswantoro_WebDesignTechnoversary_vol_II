@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: colab-ashen:prod
+    container_name: colab_ashen_app
+    restart: unless-stopped
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ashen.rule=Host(`ashen3d.web.id`) || Host(`www.ashen3d.web.id`)
+      - traefik.http.routers.ashen.entrypoints=web
+      - traefik.http.services.ashen.loadbalancer.server.port=80
+
+networks:
+  proxy:
+    external: true

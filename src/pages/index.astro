@@ -1,0 +1,17 @@
+---
+import Layout from "../layouts/Layout.astro";
+import HeroCrisisSection from "../components/home/HeroCrisisSection.astro";
+import NatureStorySection from "../components/home/NatureStorySection.astro";
+import BeforeAfterSection from "../components/home/BeforeAfterSection.astro";
+import DominoEffectSection from "../components/home/DominoEffectSection.astro";
+import InspiredParallaxSection from "../components/home/InspiredParallaxSection.astro";
+import { siteContent } from "../data/content";
+---
+
+<Layout title={`${siteContent.brand} — ${siteContent.tagline}`}>
+  <HeroCrisisSection />
+  <BeforeAfterSection />
+  <NatureStorySection />
+  <DominoEffectSection />
+  <InspiredParallaxSection />
+</Layout>

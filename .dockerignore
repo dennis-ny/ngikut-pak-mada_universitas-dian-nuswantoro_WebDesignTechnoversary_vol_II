@@ -1,0 +1,10 @@
+node_modules
+dist
+.astro
+.git
+.env
+.env.*
+npm-debug.log*
+services/news-aggregator/.venv
+services/news-aggregator/data
+prototype

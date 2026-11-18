@@ -1,0 +1,255 @@
+# Aturan klasifikasi topik (keyword berbobot) & skor keterkaitan ekologis (eco_link).
+#   strong : judul = 4 poin, cuplikan = 2 poin
+#   weak   : judul = 2 poin, cuplikan = 1 poin. Kata ambigu (ispu, hotspot, asap, ...) taruh di sini:
+#            weak HANYA dihitung bila ada minimal satu kata strong dari topik yang sama (kata pendamping).
+#   exclude: regex; bila cocok di judul/cuplikan, topik itu dibatalkan (kiasan, dll.)
+#   require_context: (opsional) minimal satu kata ini harus muncul di judul/cuplikan
+#   logistics_downrank: (opsional) regex liputan logistik/pejabat/drainase murni; menurunkan eco_link (-1)
+#                       bila artikel tidak menyebut kata ecological_link sama sekali (diturunkan, bukan dibuang)
+#   threshold: skor minimum agar topik dianggap cocok (default 4)
+#   widen_days: jendela waktu perluasan saat export bila artikel 7 hari terakhir < 3 (default 30; satwa 90)
+# Tiap istilah dihitung sekali per bidang. Topik tertinggi = topic, kedua = topic_secondary.
+# Urutan di file ini dipakai sebagai pemecah seri.
+
+# Kata kunci rantai ekologis (hulu -> hilir). Setiap kecocokan menambah skor `eco_link` (+1)
+# untuk memprioritaskan berita yang berkaitan dengan mekanisme simulasi ASHEN saat export.
+ecological_link:
+  - hutan
+  - hutan lindung
+  - hutan produksi
+  - hutan adat
+  - hutan alam
+  - suaka margasatwa
+  - taman nasional
+  - cagar alam
+  - deforestasi
+  - gundul
+  - hutan gundul
+  - lereng gundul
+  - alih fungsi
+  - hulu
+  - daerah aliran sungai
+  - das
+  - gambut
+  - lahan gambut
+  - sawit
+  - kebun sawit
+  - tambang
+  - konsesi
+  - pembalakan
+  - perambahan
+  - penebangan
+  - ekosistem
+  - koridor satwa
+  - habitat
+  - erosi
+
+topics:
+  karhutla:
+    label: "Karhutla & Asap"
+    widen_days: 30
+    gnews_query: 'karhutla OR "kebakaran hutan" OR "kebakaran lahan" OR "kabut asap" OR ISPU'
+    strong:
+      - karhutla
+      - kebakaran hutan
+      - kebakaran lahan
+      - kebakaran hutan dan lahan
+      - kabut asap
+      - asap karhutla
+      - titik api
+      - titik panas
+      - lahan gambut terbakar
+      - hutannya terbakar
+      - hutan terbakar
+      - pembakaran lahan
+      - bencana asap
+    # ambigu: hanya sah bila ditemani kata strong di atas
+    weak:
+      - ispu
+      - hotspot
+      - asap
+      - kualitas udara
+      - lahan gambut
+      - water bombing
+      - pemadaman api
+      - ispa
+      - bmkg
+      - jarak pandang
+    exclude:
+      - 'asap\s+(rokok|knalpot|kendaraan|vape|dapur|pabrik rokok)'
+      - 'hotspot\s+(wifi|wi-fi|internet|gratis)'
+      - 'titik\s+(panas|api)\s+(politik|konflik|persaingan)'
+
+  pembalakan:
+    label: "Pembalakan Liar"
+    widen_days: 90
+    gnews_query: '"pembalakan liar" OR "illegal logging" OR "penebangan liar" OR "kayu ilegal" OR "perambahan hutan"'
+    strong:
+      - pembalakan liar
+      - illegal logging
+      - penebangan liar
+      - penebangan pohon ilegal
+      - penebangan hutan ilegal
+      - pembalakan hutan
+      - pembalakan
+      - perambahan hutan
+      - perambahan kawasan hutan
+      - perambahan
+      - kayu ilegal
+      - hasil hutan ilegal
+      - pencurian kayu
+      - alih fungsi hutan
+      - alih fungsi kawasan hutan
+      - deforestasi
+      - perusakan hutan
+      - pembukaan hutan
+      - pembukaan lahan ilegal
+    weak:
+      - penebangan hutan
+      - penebangan
+      - hutan gundul
+      - kayu gelondongan
+      - kehilangan hutan
+      - kerusakan hutan
+      - hutan lindung
+      - kawasan hutan
+      - suaka margasatwa
+      - konsesi
+      - sawit ilegal
+      - tambang ilegal
+      - gakkum
+      - kehutanan
+      - tutupan hutan
+    exclude:
+      - 'deforestasi\s+(data|digital)'
+      - 'hutan\s+kota'
+      - 'uu\s+anti\s+deforestasi\s+uni\s+eropa'
+      - 'sungai\s+amazon'
+
+  banjir:
+    label: "Banjir & Longsor"
+    widen_days: 30
+    gnews_query: 'banjir OR "banjir bandang" OR "tanah longsor" OR longsor'
+    strong:
+      - banjir
+      - banjir bandang
+      - banjir rob
+      - tanah longsor
+      - longsor
+      - galodo
+    weak:
+      - bnpb
+      - bpbd
+      - meluap
+      - warga terdampak
+      - pengungsi
+      - curah hujan
+      - sungai meluap
+      - korban jiwa
+      - tanggap darurat
+    # Liputan logistik/pejabat/drainase kota murni diturunkan peringkatnya (eco_link = -1), bukan dibuang.
+    logistics_downrank:
+      - 'salurkan\s+bantuan'
+      - 'bantuan\s+penanganan'
+      - 'menko\s+pmk'
+      - 'satgas\s+prr'
+      - 'modifikasi\s+cuaca'
+      - 'titik\s+rawan\s+(genangan|banjir)'
+      - 'sudin\s+sda'
+      - 'sumur\s+bor'
+      - 'drainase\s+perkotaan'
+    exclude:
+      - 'banjir\s+(diskon|promo|promosi|dukungan|pujian|kritik|kritikan|ucapan|order|pesanan|notifikasi|komentar|hujatan|bonus|gol|tembakan|peminat|informasi|air mata|likes?|follower|penonton|pemesanan|tawaran|bintang|hadiah|cuan|suntikan|investasi|pasokan|impor|produk|data)'
+      - 'longsor\s+(suara|dukungan|elektoral)'
+
+  satwa:
+    label: "Satwa Terdampak"
+    widen_days: 90
+    gnews_query: 'orangutan OR "harimau sumatera" OR "gajah sumatera" OR "satwa liar" OR "konflik satwa"'
+    threshold: 4
+    # Wajib ada konteks dampak nyata (kematian, isolasi, konflik satwa-manusia, perburuan,
+    # atau dampak langsung karhutla/banjir/pembalakan/hilangnya habitat).
+    # Kata umum seperti "habitat", "terancam", "punah", "bksda" TIDAK cukup bila berdiri sendiri.
+    require_context:
+      - mati
+      - tewas
+      - terbunuh
+      - bangkai
+      - terisolasi
+      - terkepung
+      - kelaparan
+      - terluka
+      - konflik
+      - masuk permukiman
+      - masuk kampung
+      - masuk desa
+      - masuk kebun
+      - serang warga
+      - menerkam
+      - jerat
+      - terjerat
+      - diburu
+      - perburuan
+      - perdagangan satwa
+      - penyelundupan
+      - sisik trenggiling
+      - terdampak
+      - kehilangan habitat
+      - habitatnya rusak
+      - habitatnya hilang
+      - kepungan deforestasi
+      - memutus koridor
+      - koridor satwa
+      - penderitaan
+      - hutannya terbakar
+      - hutan terbakar
+      - kebakaran
+      - karhutla
+      - banjir
+      - longsor
+      - perambahan
+      - pembalakan
+      - deforestasi
+      - alih fungsi hutan
+      - sawit
+      - tambang
+    strong:
+      - orangutan
+      - harimau sumatera
+      - harimau
+      - macan tutul
+      - gajah sumatera
+      - gajah
+      - badak
+      - badak jawa
+      - badak sumatera
+      - beruang madu
+      - bekantan
+      - owa
+      - siamang
+      - kuskus
+      - trenggiling
+      - enggang
+      - rangkong
+      - tapir
+      - satwa liar
+      - satwa dilindungi
+      - konflik satwa
+      - konflik manusia dan satwa
+      - koridor satwa
+    weak:
+      - bksda
+      - habitat
+      - satwa
+      - kebun binatang
+      - rehabilitasi satwa
+      - pelepasliaran
+    exclude:
+      - 'tiada\s+konflik'
+      - 'tanpa\s+konflik'
+      - 'gajah\s+mada'
+      - 'harimau\s+(malaya|asia|garuda)'
+      - 'macan\s+(asia)'
+      - 'gajah\s+(oling|duduk)'
+      - 'sungai\s+amazon'
+      - 'di\s+amazon'

@@ -1,0 +1,457 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { aboutContent, siteContent } from "../data/content";
+
+const { hero, team, feedback } = aboutContent;
+---
+
+<Layout title={`Tentang Proyek & Masukan — ${siteContent.brand}`}>
+  <section class="about-hero">
+    <div class="container">
+      <div class="ah-top" data-reveal>
+        <span class="eyebrow ah-eyebrow">{hero.eyebrow}</span>
+      </div>
+
+      <h1 class="ah-title font-display" data-reveal>{hero.title}</h1>
+
+      <div class="ah-editorial" data-reveal>
+        <span class="ah-lead-label font-mono">LATAR BELAKANG</span>
+        <div class="ah-lead-body">
+          <p class="ah-subtitle">{hero.subtitle}</p>
+          <a href={siteContent.ctaSimulasi.href} class="btn-pill btn-pill--leaf ah-cta">
+            <span>Buka Simulasi 3D</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-feedback" data-nav-theme="light">
+    <div class="container">
+      <div class="fb-header" data-reveal>
+        <span class="eyebrow fb-eyebrow">{feedback.eyebrow}</span>
+        <h2 class="fb-title font-display">{feedback.title}</h2>
+        <p class="fb-desc">{feedback.description}</p>
+      </div>
+
+      <div class="fb-grid">
+        <aside class="team-block" data-reveal>
+          <div class="team-head">
+            <span class="team-label font-mono">{team.label}</span>
+            <span class="team-inst">{team.institution}</span>
+          </div>
+          <ul class="team-list">
+            {team.members.map((member, idx) => (
+              <li class="team-row">
+                <span class="team-idx font-mono">0{idx + 1}</span>
+                <div class="team-info">
+                  <span class="team-name">{member.name}</span>
+                  <span class="team-role">{member.role}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <div class="fb-form-card" data-reveal>
+          <form id="ashen-feedback-form" novalidate>
+            <div class="field-group">
+              <span class="field-label">Topik</span>
+              <div class="pill-group" id="fb-topics" role="radiogroup" aria-label="Topik masukan">
+                {feedback.topics.map((topic, idx) => (
+                  <button
+                    type="button"
+                    class:list={["choice-pill", { "is-selected": idx === 0 }]}
+                    data-topic={topic}
+                    aria-pressed={idx === 0 ? "true" : "false"}
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="fb-author" class="field-label">Nama <span class="opt">(opsional)</span></label>
+              <input
+                id="fb-author"
+                name="author"
+                type="text"
+                maxlength="48"
+                placeholder="Nama atau instansi kamu"
+                class="fb-input"
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="fb-message" class="field-label">Saran &amp; Masukan</label>
+              <textarea
+                id="fb-message"
+                name="message"
+                rows="4"
+                maxlength="300"
+                required
+                placeholder="Tulis masukan untuk simulasi 3D, materi, atau tampilan..."
+                class="fb-textarea"
+              ></textarea>
+            </div>
+
+            <div class="fb-submit-row">
+              <button type="submit" class="btn-pill fb-submit-btn">
+                <span>Kirim Masukan</span>
+                <span aria-hidden="true">↗</span>
+              </button>
+              <span class="fb-status" id="fb-status" role="status" aria-live="polite"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script define:vars={{ defaultTopic: feedback.topics[0] }}>
+  const STORAGE_KEY = "ashen_feedback_v1";
+  const form = document.getElementById("ashen-feedback-form");
+  const topicBtns = Array.from(document.querySelectorAll("[data-topic]"));
+  const authorInput = document.getElementById("fb-author");
+  const messageInput = document.getElementById("fb-message");
+  const statusEl = document.getElementById("fb-status");
+
+  let selectedTopic = defaultTopic;
+
+  topicBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      topicBtns.forEach((b) => {
+        b.classList.remove("is-selected");
+        b.setAttribute("aria-pressed", "false");
+      });
+      btn.classList.add("is-selected");
+      btn.setAttribute("aria-pressed", "true");
+      selectedTopic = btn.getAttribute("data-topic") || defaultTopic;
+    });
+  });
+
+  if (form && messageInput && statusEl) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = messageInput.value.trim();
+      if (text.length < 4) {
+        statusEl.textContent = "Tulis minimal 4 karakter dulu ya.";
+        statusEl.className = "fb-status is-error";
+        messageInput.focus();
+        return;
+      }
+
+      const author = authorInput && authorInput.value.trim() ? authorInput.value.trim() : "Anonim";
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const stored = raw ? JSON.parse(raw) : [];
+        const list = Array.isArray(stored) ? stored : [];
+        list.unshift({ author, topic: selectedTopic, message: text, createdAt: Date.now() });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0, 10)));
+      } catch {
+        // Ignore storage quota errors
+      }
+
+      messageInput.value = "";
+      if (authorInput) authorInput.value = "";
+      statusEl.textContent = "Terima kasih, masukanmu sudah tersimpan.";
+      statusEl.className = "fb-status is-ok";
+    });
+  }
+</script>
+
+<style>
+  .about-hero {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-charcoal-deep);
+    background-image:
+      radial-gradient(ellipse 65% 55% at 85% 18%, rgba(224, 86, 28, 0.11) 0%, rgba(242, 169, 59, 0.04) 45%, transparent 72%),
+      url("/images/topo-contours.svg"),
+      linear-gradient(180deg, #1a1411 0%, var(--color-charcoal-deep) 55%, #191411 100%);
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-size: auto, min(100%, 1440px) auto, auto;
+    background-position: center, right bottom, center;
+    color: var(--color-cream);
+    padding: 140px 0 var(--space-band);
+    border-bottom: 1px solid rgba(252, 246, 236, 0.1);
+  }
+
+  .ah-top {
+    margin-bottom: 24px;
+  }
+
+  .ah-eyebrow {
+    color: var(--color-smoke-amber);
+  }
+
+  .ah-title {
+    font-size: clamp(52px, 7.5vw, 108px);
+    color: var(--color-cream);
+    margin-bottom: 32px;
+    max-width: 1080px;
+  }
+
+  .ah-editorial {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .ah-lead-label {
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: rgba(252, 246, 236, 0.5);
+    padding-top: 6px;
+  }
+
+  .ah-lead-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .ah-subtitle {
+    font-size: clamp(16px, 1.35vw, 19px);
+    line-height: 1.55;
+    color: rgba(252, 246, 236, 0.9);
+    max-width: 700px;
+  }
+
+  .ah-cta {
+    gap: 10px;
+  }
+
+  /* Light Section: Spacious & Breathable */
+  .about-feedback {
+    background-color: var(--color-ash-canvas);
+    color: var(--color-charcoal);
+    padding: var(--space-band) 0;
+  }
+
+  .fb-header {
+    max-width: 680px;
+    margin-bottom: 52px;
+  }
+
+  .fb-eyebrow {
+    color: var(--color-ember);
+    margin-bottom: 12px;
+  }
+
+  .fb-title {
+    font-size: clamp(44px, 6vw, 84px);
+    margin-bottom: 14px;
+  }
+
+  .fb-desc {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(46, 37, 33, 0.8);
+  }
+
+  .fb-grid {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* Left: Clean Team Block */
+  .team-block {
+    padding-top: 8px;
+  }
+
+  .team-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(46, 37, 33, 0.16);
+  }
+
+  .team-label {
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: var(--color-ember);
+  }
+
+  .team-inst {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-charcoal);
+  }
+
+  .team-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .team-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(46, 37, 33, 0.12);
+  }
+
+  .team-row:first-child {
+    padding-top: 0;
+  }
+
+  .team-idx {
+    font-size: 12px;
+    color: rgba(46, 37, 33, 0.45);
+  }
+
+  .team-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .team-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--color-charcoal);
+  }
+
+  .team-role {
+    font-size: 14px;
+    color: rgba(46, 37, 33, 0.7);
+  }
+
+  /* Right: Clean Form Card */
+  .fb-form-card {
+    background-color: var(--color-cream);
+    border: 1px solid rgba(46, 37, 33, 0.14);
+    border-radius: var(--radius-sm);
+    padding: clamp(24px, 3vw, 38px);
+  }
+
+  .field-group {
+    margin-bottom: 24px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-charcoal);
+    margin-bottom: 10px;
+  }
+
+  .opt {
+    font-weight: 400;
+    color: rgba(46, 37, 33, 0.52);
+  }
+
+  .pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .choice-pill {
+    padding: 8px 16px;
+    border-radius: 9999px;
+    border: 1px solid rgba(46, 37, 33, 0.22);
+    background-color: transparent;
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .choice-pill:hover {
+    border-color: var(--color-charcoal);
+  }
+
+  .choice-pill.is-selected {
+    background-color: var(--color-charcoal);
+    border-color: var(--color-charcoal);
+    color: var(--color-cream);
+  }
+
+  .fb-input,
+  .fb-textarea {
+    width: 100%;
+    border: 1px solid rgba(46, 37, 33, 0.2);
+    border-radius: var(--radius-xs);
+    background-color: var(--color-ash-canvas);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .fb-input:focus,
+  .fb-textarea:focus {
+    outline: none;
+    border-color: var(--color-charcoal);
+    background-color: #ffffff;
+  }
+
+  .fb-textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.55;
+  }
+
+  .fb-submit-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .fb-submit-btn {
+    background-color: var(--color-charcoal);
+    color: var(--color-cream);
+    border: 1px solid var(--color-charcoal);
+    cursor: pointer;
+    gap: 10px;
+  }
+
+  .fb-submit-btn:hover {
+    background-color: var(--color-ember);
+    border-color: var(--color-ember);
+  }
+
+  .fb-status {
+    font-size: 13.5px;
+  }
+
+  .fb-status.is-ok {
+    color: #2f6b2d;
+  }
+
+  .fb-status.is-error {
+    color: var(--color-ember);
+  }
+
+  @media (max-width: 980px) {
+    .ah-editorial,
+    .fb-grid {
+      grid-template-columns: 1fr;
+    }
+    .ah-editorial {
+      gap: 14px;
+    }
+    .fb-grid {
+      gap: 36px;
+    }
+  }
+</style>

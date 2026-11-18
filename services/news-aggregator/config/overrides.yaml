@@ -1,0 +1,13 @@
+# Kurasi manual ringan untuk ekspor berita (/belajar).
+#
+# Aturan etika & keaslian data:
+# - File ini HANYA boleh memilih (pin) atau menyembunyikan (block) artikel nyata yang sudah
+#   ada di database berdasarkan URL / canonical URL-nya.
+# - TIDAK BOLEH dipakai untuk mengubah judul, cuplikan, tanggal, atau sumber artikel.
+# - Workflow GitHub Actions otomatis membaca file ini saat menjalankan `ashen-news export`.
+
+# Daftar URL artikel yang ingin selalu dinaikkan ke urutan paling atas di kategorinya:
+pin_urls: []
+
+# Daftar URL artikel yang ingin disembunyikan dari snapshot situs (mis. liputan off-topic):
+block_urls: []

@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# database lokal & laporan audit dry-run (snapshot publik ada di src/data/generated/news.json)
+data/*.db
+data/*.db-*
+data/audit/

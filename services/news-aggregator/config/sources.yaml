@@ -1,0 +1,45 @@
+# Konfigurasi sumber. Semua URL feed sudah diverifikasi langsung (2026-11-18).
+#
+# Kontak User-Agent TIDAK disimpan di sini. Set env ASHEN_NEWS_CONTACT (email atau URL repo);
+# di GitHub Actions lewat secret. Tanpa kontak, `fetch` menolak berjalan.
+user_agent_name: "AshenNewsBot/0.1"
+
+http:
+  delay_seconds: [1.0, 2.0]   # jeda acak antar request (semua host)
+  timeout_seconds: 20
+  max_attempts: 3             # per request, backoff eksponensial + jitter
+  respect_robots: true
+
+# Feed RSS langsung per media (feed umum per kanal; topik disaring di sisi kita).
+feeds:
+  - {id: antara-terkini,       source: Antara,             url: "https://www.antaranews.com/rss/terkini.xml"}
+  - {id: antara-warta-bumi,    source: Antara,             url: "https://www.antaranews.com/rss/warta-bumi.xml"}
+  # Kanal Antara untuk kasus penegakan hukum kehutanan dan kejadian daerah.
+  - {id: antara-hukum,         source: Antara,             url: "https://www.antaranews.com/rss/hukum.xml"}
+  - {id: antara-lintas-kota,   source: Antara,             url: "https://www.antaranews.com/rss/metro-lintas-kota.xml"}
+  - {id: cnn-nasional,         source: CNN Indonesia,      url: "https://www.cnnindonesia.com/nasional/rss"}
+  - {id: detik-berita,         source: Detik,              url: "https://news.detik.com/berita/rss"}
+  - {id: tempo-nasional,       source: Tempo,              url: "https://rss.tempo.co/nasional"}
+  - {id: mongabay-id,          source: Mongabay Indonesia, url: "https://www.mongabay.co.id/feed/"}
+  # Feed pencarian WordPress Mongabay (robots.txt Mongabay 200 OK 0 byte -> mengizinkan ?s=).
+  # Catatan: /category/<slug>/feed/ di Mongabay hanya me-redirect ke /feed/ utama atau 404,
+  # sedangkan ?s=<query>&feed=rss2 benar-benar mengembalikan artikel sesuai topik.
+  - {id: mongabay-deforestasi, source: Mongabay Indonesia, url: "https://www.mongabay.co.id/?s=deforestasi&feed=rss2"}
+  - {id: mongabay-orangutan,   source: Mongabay Indonesia, url: "https://www.mongabay.co.id/?s=orangutan&feed=rss2"}
+  - {id: mongabay-harimau,     source: Mongabay Indonesia, url: "https://www.mongabay.co.id/?s=harimau+sumatera&feed=rss2"}
+
+# Google News RSS: pencarian per topik x domain (site:). Link TIDAK di-resolve.
+# DINONAKTIFKAN: https://news.google.com/robots.txt berisi `User-agent: * / Disallow: /`
+# dan jalur /rss/ tidak ada di daftar Allow, jadi bot generik tidak boleh mengambilnya
+# (dicek 2026-11-18; pipeline menghormati ini dan menolak fetch). Kode tetap ada;
+# aktifkan hanya bila kebijakan Google berubah / ada izin tertulis.
+gnews:
+  enabled: false
+  when: "7d"
+  domains:
+    - {domain: kompas.com,        source: Kompas}
+    - {domain: antaranews.com,    source: Antara}
+    - {domain: detik.com,         source: Detik}
+    - {domain: cnnindonesia.com,  source: CNN Indonesia}
+    - {domain: tempo.co,          source: Tempo}
+    - {domain: mongabay.co.id,    source: Mongabay Indonesia}

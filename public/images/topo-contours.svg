@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="640" viewBox="0 0 1440 640" fill="none">
+  <!-- Minimalist Horizon Ridge (2 calm sweeping lines) -->
+  <g stroke="#FCF6EC" stroke-linecap="round" stroke-linejoin="round">
+    <path opacity="0.06" stroke-width="1.2" d="M620 640 C 780 560, 960 470, 1180 445 C 1290 432, 1375 440, 1460 460" />
+    <path opacity="0.04" stroke-width="1" d="M820 640 C 970 575, 1130 515, 1310 500 C 1375 495, 1420 502, 1460 512" />
+
+    <!-- Tree 1 (Main Tall Forest Pine on Right Ridge - x:1190, base y:444) -->
+    <g opacity="0.085" stroke-width="1.3">
+      <!-- Trunk -->
+      <line x1="1190" y1="210" x2="1190" y2="444" />
+      <!-- Minimalist Layered Canopy Tiers -->
+      <path d="M1190 202 L1156 258 L1224 258 Z" />
+      <path d="M1190 242 L1144 312 L1236 312 Z" />
+      <path d="M1190 288 L1132 370 L1248 370 Z" />
+      <path d="M1190 338 L1122 422 L1258 422 Z" />
+    </g>
+
+    <!-- Tree 2 (Medium Companion Tree - x:1305, base y:442) -->
+    <g opacity="0.06" stroke-width="1.2">
+      <line x1="1305" y1="276" x2="1305" y2="442" />
+      <path d="M1305 270 L1278 316 L1332 316 Z" />
+      <path d="M1305 304 L1268 362 L1342 362 Z" />
+      <path d="M1305 344 L1258 412 L1352 412 Z" />
+    </g>
+
+    <!-- Tree 3 (Smaller Distant Tree on Lower Slope - x:1055, base y:472) -->
+    <g opacity="0.05" stroke-width="1.1">
+      <line x1="1055" y1="340" x2="1055" y2="472" />
+      <path d="M1055 334 L1033 372 L1077 372 Z" />
+      <path d="M1055 362 L1025 410 L1085 410 Z" />
+      <path d="M1055 394 L1017 448 L1093 448 Z" />
+    </g>
+
+    <!-- Tree 4 (Subtle Bare/Burned Trunk Silhouette on Far Left of Ridge - x:945, base y:506) -->
+    <g opacity="0.045" stroke-width="1.1">
+      <line x1="945" y1="398" x2="945" y2="506" />
+      <line x1="945" y1="432" x2="928" y2="414" />
+      <line x1="945" y1="452" x2="964" y2="434" />
+      <line x1="945" y1="470" x2="932" y2="456" />
+    </g>
+  </g>
+</svg>

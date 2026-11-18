@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro";
+import MountainSim3D from "../components/simulasi/MountainSim3D.astro";
+import { siteContent } from "../data/content";
+---
+
+<Layout
+  title={`Simulasi 3D — ${siteContent.brand}`}
+  disableSmoothScroll={true}
+  hideFooter={true}
+>
+  <MountainSim3D />
+</Layout>

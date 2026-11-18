@@ -1,0 +1,1712 @@
+---
+---
+
+<section class="mountain-sim-wrap" id="mountain-sim-wrap" data-nav-theme="rain">
+  <div id="app"></div>
+
+  <div id="tools">
+    <button class="on" id="t-fire" type="button">Api</button>
+    <button id="t-saw" type="button">Tebang</button>
+    <button id="t-plant" type="button">Tanam</button>
+    <button id="rain" type="button">Hujan</button>
+    <button id="reset" type="button">Reset</button>
+  </div>
+
+  <div id="panel">
+    <div class="card m" title="Kualitas udara"><span class="ic">💨</span><div class="l">Kualitas udara</div><span class="pill air-pill" id="cat">Baik</span></div>
+    <div class="card m" title="Tutupan hutan"><span class="ic">🌲</span><div class="l">Tutupan hutan</div><div class="v" id="cover">100%</div></div>
+    <div class="card m" title="Pemukiman terdampak banjir"><span class="ic">🏠</span><div class="l">Pemukiman terdampak banjir</div><div class="v" id="hs">0 / 8</div></div>
+    <div class="card m" title="Satwa hidup"><span class="ic">🐒</span><div class="l">Satwa hidup</div><div class="v" id="wild">26 / 26</div></div>
+  </div>
+
+  <div id="hover" class="card"></div>
+  <div id="help">Drag: putar<span class="sep">&middot;</span>Scroll: zoom<span class="sep">&middot;</span>Klik area: interaksi</div>
+  <div id="legend" class="card">
+    <span><i style="background:#5b8c3a"></i>sehat</span>
+    <span><i style="background:#e0561c"></i>terbakar</span>
+    <span><i style="background:#2d2a27"></i>hangus</span>
+    <span><i style="background:#9c6b36"></i>gundul</span>
+    <span><i style="background:#93b958"></i>pulih</span>
+    <span><i style="background:#6b4a2b"></i>longsor</span>
+    <span><i style="background:linear-gradient(180deg,#d63a2c 0 50%,#f5f5f5 50% 100%)"></i>rumah tertinggi</span>
+  </div>
+  <div id="msg" class="card">Pilih alat, lalu klik area di gunung.</div>
+</section>
+
+<script>
+// @ts-nocheck
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+
+const simRoot = document.getElementById('mountain-sim-wrap');
+const app = document.getElementById('app');
+
+if (simRoot && app) {
+  /* ====================== KONFIGURASI ====================== */
+  const S = 2.3;          // skala lebar gunung
+  const HS = 2.5;         // skala tinggi gunung
+  const R0 = 5;           // radius gunung dasar (sebelum skala)
+  const R = R0 * S;       // radius gunung
+  const H = 3.3 * HS;     // tinggi puncak
+  const LR = 20;          // radius dataran (desa)
+  const B = 0.45;         // ketinggian kaki gunung (di atas lahan pemukiman)
+  const NR = 6;           // jumlah cincin (puncak -> kaki)
+  const NS = 16;          // jumlah sektor per cincin
+  const N = NR * NS;      // total area
+  const SR = 4, SA = 4;   // subdivisi per area (kehalusan mesh)
+  const NJ = NR * SR, NK = NS * SA;
+  const BURN_MS = 6000;   // lama api menyala
+  const FIRE_SPREAD_CHANCE = 0.018; // peluang api merembet ke tetangga per tick
+  const FIRE_MAX_HOPS = 2;          // maksimal jarak rembetan dari 1 titik bakar (2 = maks radius 2 petak)
+  const RAIN_MS = 10000;  // durasi hujan
+  const FLOOD_DELAY_MS = 4000; // hujan dulu sekian milidetik sebelum banjir mulai naik (hujan total 10 detik)
+  const SMOKE_CLEAR_MIN_MS = 4000;  // durasi minimum pemulihan asap ringan
+  const SMOKE_CLEAR_MAX_MS = 18000; // durasi maksimum pemulihan asap parah
+  const RAIN_WASH_MULT = 2.6;       // percepatan hilangnya asap saat hujan turun
+
+  /* ====================== STATE SIMULASI ====================== */
+  /* st: h=sehat, b=terbakar, x=hangus, g=gundul, r=pulih */
+  const cells = [];
+  let tool = 'fire', rainUntil = 0, rainStart = 0, wasRain = false;
+  let flood = 0, airLevel = 25, smoothAir = 25, prevBurn = 0, hover = -1, dirty = true, rainF = 0;
+  let smokeClearElapsed = 0, smokeClearFrom = 25, smokeClearDur = SMOKE_CLEAR_MIN_MS, lastAirTick = 0;
+
+  function initCells() {
+    cells.length = 0;
+    for (let i = 0; i < N; i++) cells.push({ st: 'h', t: 0, hop: 0, slide: false, vis: '' });
+  }
+  initCells();
+
+  /* ====================== SCENE ====================== */
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  app.appendChild(renderer.domElement);
+
+  const SKY_CLEAR = new THREE.Color(0x6ebce8);
+  const SKY_RAIN = new THREE.Color(0x6f7f8c);
+  const SKY_SMOKE = new THREE.Color(0x6c584c);
+  const sky = SKY_CLEAR.clone();
+
+  const scene = new THREE.Scene();
+  scene.background = sky;
+  scene.fog = new THREE.Fog(sky, 72, 200);
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 300);
+  camera.position.set(25, 20, 25);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 2.8, 0);
+  controls.enableDamping = true;
+  controls.enablePan = false;
+  controls.minDistance = 15;
+  controls.maxDistance = 70;
+  controls.maxPolarAngle = 1.45;
+  controls.update();
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x6b5a3a, 0.95);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffffff, 1.15);
+  sun.position.set(6, 10, 4);
+  scene.add(sun);
+
+  /* ====================== TERRAIN ====================== */
+  const PEAKS = [
+    { x: -1.3, z: 0.4,  h: 3.7, rad: 3.0 },   // puncak utama
+    { x: 1.7,  z: -1.0, h: 2.9, rad: 2.4 }    // puncak kedua
+  ];
+  const DOMES = [
+    { x: -0.4, z: 2.3, r: 1.5, h: 1.75 },     // setengah bola depan
+    { x: -1.5, z: -2.3, r: 1.5, h: 1.75 }     // setengah bola belakang
+  ];
+  const RIDGE = { x1: 2.0, z1: 0.8, x2: 2.5, z2: 2.1, r: 1.0, h: 1.35 };    // setengah tabung
+
+  function segDist(px, pz, x1, z1, x2, z2) {
+    const dx = x2 - x1, dz = z2 - z1;
+    const t = Math.max(0, Math.min(1, ((px - x1) * dx + (pz - z1) * dz) / (dx * dx + dz * dz)));
+    return Math.hypot(px - (x1 + t * dx), pz - (z1 + t * dz));
+  }
+
+  function hgt(x, z) { return B + HS * hgt0(x / S, z / S); }
+  function hgt0(x, z) {
+    const r = Math.hypot(x, z);
+    let base = 0;
+    for (const p of PEAKS) {
+      const d = Math.hypot(x - p.x, z - p.z);
+      base += p.h * Math.pow(Math.max(0, 1 - d / p.rad), 1.5);
+    }
+    let dome = 0;
+    for (const D of DOMES) { const dd = Math.hypot(x - D.x, z - D.z) / D.r; dome = Math.max(dome, D.h * Math.sqrt(Math.max(0, 1 - dd * dd))); }
+    const rd = segDist(x, z, RIDGE.x1, RIDGE.z1, RIDGE.x2, RIDGE.z2) / RIDGE.r;
+    const ridge = RIDGE.h * Math.sqrt(Math.max(0, 1 - rd * rd));
+
+    const h = Math.max(base, dome, ridge);
+    const tt = Math.max(0, Math.min(1, (R0 - r) / (R0 * 0.35)));
+    const f = tt * tt * (3 - 2 * tt);
+    const n = (Math.sin(x * 1.3 + 0.7) * Math.cos(z * 1.1) * 0.12 + Math.sin(x * 2.7 + z * 1.9) * 0.07) * Math.min(1, h * 1.5);
+    return Math.max(0, (h + n) * f);
+  }
+  function hash2(x, y) { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; }
+  function vnoise(x, y) {
+    const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy, u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+    const a = hash2(ix, iy), b = hash2(ix + 1, iy), c = hash2(ix, iy + 1), d = hash2(ix + 1, iy + 1);
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+  }
+
+  const NC = 8;
+  const HOUSE_K = 1.5;
+  const PAD_FLAT = 2.7, PAD_EDGE = 0.8;
+  const PADS = [];
+  {
+    const order = [3, 0, 6, 2, 7, 4, 1, 5, 8, 9, 10, 11].slice(0, NC);
+    const ranked = order.slice().sort((p, q) => p - q);
+    for (let c = 0; c < NC; c++) {
+      const an = (c + 0.5) / NC * Math.PI * 2 + Math.sin(c * 2.3) * 0.08, r = R + (LR - R) * 0.5 + Math.cos(c * 1.7) * 0.15;
+      const rank = ranked.indexOf(order[c]);
+      PADS.push({ x: r * Math.cos(an), z: r * Math.sin(an), y: 0.06 + 0.24 * rank / (NC - 1) });
+    }
+  }
+  function plainH(x, z) {
+    const r = Math.hypot(x, z);
+    if (r <= R) return B;
+    const q = Math.min(1, (r - R) / 1.2), s = q * q * (3 - 2 * q);
+    const n = vnoise(x * 0.62 + 3.1, z * 0.62 - 1.7) * 0.7 + vnoise(x * 1.35 - 8.4, z * 1.35 + 5.2) * 0.3;
+    const hills = Math.max(0, n - 0.30) * 1.15;
+    let h = B * (1 - s) + s * (0.03 + hills);
+    for (const pd of PADS) {
+      const d = Math.hypot(x - pd.x, z - pd.z);
+      if (d < PAD_FLAT + PAD_EDGE) { const t = Math.min(1, (PAD_FLAT + PAD_EDGE - d) / PAD_EDGE), w = t * t * (3 - 2 * t); h += (pd.y - h) * w; }
+    }
+    const q2 = Math.min(1, Math.max(0, (r - (LR - 1.4)) / 1.4)), w2 = q2 * q2 * (3 - 2 * q2), RIM = 0.58;
+    if (h < RIM) h += (RIM - h) * w2;
+    return h;
+  }
+  function ground(x, z) { return Math.hypot(x, z) <= R ? meshY(x, z) : plainH(x, z); }
+  function meshY(x, z) {
+    const r = Math.hypot(x, z);
+    if (r >= R) return hgt(x, z);
+    let a = Math.atan2(z, x); if (a < 0) a += Math.PI * 2;
+    const jf = r / R * NJ, kf = a / (Math.PI * 2) * NK;
+    if (jf < SR) {
+      const k0 = Math.min(NK - 8, Math.floor(kf / 8) * 8);
+      const tris = innerWedgeTris[k0 >> 3];
+      for (let t = 0; t < tris.length; t++) {
+        const [j0, kA, j1, kB, j2, kC] = tris[t];
+        const r0 = R * j0 / NJ, x0 = r0 * COSA[kA], z0 = r0 * SINA[kA];
+        const r1 = R * j1 / NJ, x1 = r1 * COSA[kB], z1 = r1 * SINA[kB];
+        const r2 = R * j2 / NJ, x2 = r2 * COSA[kC], z2 = r2 * SINA[kC];
+        const d = (z1 - z2) * (x0 - x2) + (x2 - x1) * (z0 - z2);
+        if (Math.abs(d) < 1e-8) continue;
+        const w0 = ((z1 - z2) * (x - x2) + (x2 - x1) * (z - z2)) / d;
+        const w1 = ((z2 - z0) * (x - x2) + (x0 - x2) * (z - z2)) / d;
+        const w2 = 1 - w0 - w1;
+        if (w0 >= -1e-4 && w1 >= -1e-4 && w2 >= -1e-4) {
+          return w0 * vy(j0, kA) + w1 * vy(j1, kB) + w2 * vy(j2, kC);
+        }
+      }
+    }
+    const j = Math.min(NJ - 1, Math.floor(jf)), k0 = Math.floor(kf), k = k0 % NK, v = jf - j, u = kf - k0;
+    const ya = vy(j, k), yc = vy(j + 1, k + 1);
+    if (v > u) { const yb = vy(j + 1, k); return ya + (yb - ya) * (v - u) + (yc - ya) * u; }
+    const yd = vy(j, k + 1); return ya + (yd - ya) * (u - v) + (yc - ya) * v;
+  }
+
+  function P(j, k) {
+    const r = R * j / NJ, a = k * Math.PI * 2 / NK;
+    const x = r * Math.cos(a), z = r * Math.sin(a);
+    return [x, hgt(x, z), z];
+  }
+
+  const VY0 = new Float32Array((NJ + 1) * NK), VY = new Float32Array((NJ + 1) * NK);
+  for (let j = 0; j <= NJ; j++) for (let k = 0; k < NK; k++) VY0[j * NK + k] = P(j, k)[1];
+  VY.set(VY0);
+  function vy(j, k) { return VY[j * NK + (k % NK)]; }
+  const COSA = [], SINA = [];
+  for (let k = 0; k <= NK; k++) { COSA.push(Math.cos(k * Math.PI * 2 / NK)); SINA.push(Math.sin(k * Math.PI * 2 / NK)); }
+
+  const triVerts = [], faceCell = [], faceShade = [], innerWedgeTris = [];
+  {
+    const addTri = (j0, k0, j1, k1, j2, k2, cid, shade) => {
+      triVerts.push(j0, k0, j1, k1, j2, k2);
+      faceCell.push(cid);
+      faceShade.push(shade);
+    };
+    for (let k0 = 0; k0 < NK; k0 += 8) {
+      const cA = Math.floor(k0 / SA), cB = cA + 1;
+      const wTris = [];
+      const pushW = (j0, kA, j1, kB, j2, kC, cid, shade) => {
+        addTri(j0, kA, j1, kB, j2, kC, cid, shade);
+        wTris.push([j0, kA, j1, kB, j2, kC]);
+      };
+      pushW(0, 0, 2, k0 + 8, 2, k0, cA, 0.97 + Math.random() * 0.05);
+      for (let m = 0; m < 4; m++) pushW(2, k0, 4, k0 + m + 1, 4, k0 + m, cA, 0.95 + Math.random() * 0.08);
+      pushW(2, k0, 2, k0 + 8, 4, k0 + 4, cA, 0.95 + Math.random() * 0.08);
+      for (let m = 4; m < 8; m++) pushW(2, k0 + 8, 4, k0 + m + 1, 4, k0 + m, cB, 0.95 + Math.random() * 0.08);
+      innerWedgeTris.push(wTris);
+    }
+    for (let j = SR; j < NJ; j++) {
+      for (let k = 0; k < NK; k++) {
+        const cid = Math.floor(j / SR) * NS + Math.floor(k / SA);
+        addTri(j, k, j + 1, k + 1, j + 1, k, cid, 0.93 + Math.random() * 0.14);
+        addTri(j, k, j, k + 1, j + 1, k + 1, cid, 0.93 + Math.random() * 0.14);
+      }
+    }
+  }
+  function fillTerrainPos(arr) {
+    let o = 0;
+    for (let t = 0; t < triVerts.length; t += 2) {
+      const j = triVerts[t], k = triVerts[t + 1];
+      const r = R * j / NJ;
+      arr[o++] = r * COSA[k];
+      arr[o++] = vy(j, k);
+      arr[o++] = r * SINA[k];
+    }
+  }
+  const posBuf = new Float32Array(faceCell.length * 9);
+  fillTerrainPos(posBuf);
+  const terrainGeo = new THREE.BufferGeometry();
+  const posAttr = new THREE.BufferAttribute(posBuf, 3);
+  terrainGeo.setAttribute('position', posAttr);
+  const colorAttr = new THREE.BufferAttribute(new Float32Array(posBuf.length), 3);
+  terrainGeo.setAttribute('color', colorAttr);
+  const mountain = new THREE.Mesh(
+    terrainGeo,
+    new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, side: THREE.DoubleSide })
+  );
+
+  const slideAnims = [];
+  const ERODE = 0.65;
+  const DEPOSIT = 0.4;
+  const SLIDE_DUR = 1.4;
+  const SLIDE_MUD = 18;
+  const SLIDE_DUST = 5;
+  const SLIDE_DELAY_MS = 5000;
+  const bump = (i, n) => Math.max(0, Math.cos(Math.PI * (i - n / 2) / (n + 2)));
+  function startSlide(i) {
+    const c = cells[i];
+    if (c.eroded) return;
+    c.eroded = true; slideAnims.push({ i, p: 0 });
+    for (let k = 0; k < SLIDE_MUD; k++) {
+      const p = randPoint(i), m = mud.ptr;
+      spawn(mud, p.x, p.y + 0.1, p.z, 0, 0, 0, 3.5);
+      mudVel[m] = 0.9 + Math.random() * 1.4;
+    }
+    for (let k = 0; k < SLIDE_DUST; k++) {
+      const p = randPoint(i);
+      spawn(smoke, p.x, p.y + 0.2, p.z, (Math.random() - 0.5) * 0.8, 0.5 + Math.random() * 0.6, (Math.random() - 0.5) * 0.8, 1.5 + Math.random());
+    }
+  }
+  function shiftCell(i, amount) {
+    const ring = Math.floor(i / NS), sec = i % NS;
+    for (let jj = 0; jj <= SR; jj++) for (let kk = 0; kk <= SA; kk++) {
+      const idx = (ring * SR + jj) * NK + ((sec * SA + kk) % NK);
+      VY[idx] = Math.max(B, VY[idx] + amount * bump(jj, SR) * bump(kk, SA));
+    }
+  }
+  function stepSlides(dt) {
+    if (!slideAnims.length) return;
+    const ease = t => t * t * (3 - 2 * t);
+    const touchedCells = new Set();
+    for (let n = slideAnims.length - 1; n >= 0; n--) {
+      const a = slideAnims[n], np = Math.min(1, a.p + dt / SLIDE_DUR), d = ease(np) - ease(a.p);
+      const ring = Math.floor(a.i / NS), sec = a.i % NS;
+      shiftCell(a.i, -ERODE * d);
+      if (ring + 1 < NR) shiftCell(a.i + NS, DEPOSIT * d);
+      if (a.p < 0.3 && np >= 0.3) cells[a.i].gone = true;
+      a.p = np;
+      for (let dr = -1; dr <= 1; dr++) for (let ds = -1; ds <= 1; ds++) {
+        const rr = ring + dr; if (rr < 0 || rr >= NR) continue;
+        touchedCells.add(rr * NS + (sec + ds + NS) % NS);
+      }
+      if (np >= 1) slideAnims.splice(n, 1);
+    }
+    touchedCells.forEach(cid => refreshCellTreePos(cid));
+    foliage.instanceMatrix.needsUpdate = true;
+    trunk.instanceMatrix.needsUpdate = true;
+    fillTerrainPos(posBuf); posAttr.needsUpdate = true;
+    if (!slideAnims.length) terrainGeo.computeBoundingSphere();
+  }
+  function resetTerrain() {
+    slideAnims.length = 0; VY.set(VY0); fillTerrainPos(posBuf); posAttr.needsUpdate = true; terrainGeo.computeBoundingSphere();
+  }
+  scene.add(mountain);
+
+  /* dataran + desa (berkontur) */
+  const villageHouses = []; let LMAX = 0.5, topIdx = 0;
+  {
+    const NPJ = 40, NPK = 180, pp = [], pc = [], pi = [], c = new THREE.Color();
+    for (let j = 0; j <= NPJ; j++) for (let k = 0; k < NPK; k++) {
+      const RI = R - 0.6, r = RI + (LR - RI) * j / NPJ, a = k * Math.PI * 2 / NPK, x = r * Math.cos(a), z = r * Math.sin(a), h = plainH(x, z);
+      pp.push(x, r <= R ? B - 0.03 : h, z);
+      c.setRGB(0.27, 0.45, 0.19).lerp(new THREE.Color(0.55, 0.61, 0.30), Math.min(1, h / 0.6)).multiplyScalar(0.95 + Math.random() * 0.1);
+      pc.push(c.r, c.g, c.b);
+    }
+    for (let j = 0; j < NPJ; j++) for (let k = 0; k < NPK; k++) {
+      const a = j * NPK + k, b = j * NPK + (k + 1) % NPK, d = (j + 1) * NPK + k, e = (j + 1) * NPK + (k + 1) % NPK;
+      pi.push(a, b, d, b, e, d);
+    }
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pp), 3));
+    pg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(pc), 3));
+    pg.setIndex(pi); pg.computeVertexNormals();
+    scene.add(new THREE.Mesh(pg, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })));
+
+    const SEG = NPK, wp = [], wc = [], wi = [];
+    for (let k = 0; k < SEG; k++) {
+      const a = k / SEG * Math.PI * 2, x = LR * Math.cos(a), z = LR * Math.sin(a), y = plainH(x, z);
+      wp.push(x, y, z, x, y - 0.08, z, x, -0.6, z);
+      wc.push(0.43, 0.56, 0.25, 0.42, 0.29, 0.17, 0.25, 0.17, 0.1);
+    }
+    for (let k = 0; k < SEG; k++) for (let row = 0; row < 2; row++) {
+      const a = k * 3 + row, b = ((k + 1) % SEG) * 3 + row; wi.push(a, b, a + 1, b, b + 1, a + 1);
+    }
+    const wg = new THREE.BufferGeometry();
+    wg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(wp), 3));
+    wg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(wc), 3));
+    wg.setIndex(wi); wg.computeVertexNormals();
+    scene.add(new THREE.Mesh(wg, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, side: THREE.DoubleSide })));
+
+    const bodyGeo = new THREE.BoxGeometry(0.4, 0.3, 0.4), roofGeo = new THREE.ConeGeometry(0.34, 0.25, 4);
+    const houseMats = {
+      body: new THREE.MeshStandardMaterial({ color: 0xfaf5eb, flatShading: true }),
+      roof: new THREE.MeshStandardMaterial({ color: 0xb5523b, flatShading: true })
+    };
+    let sd = 7; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    const picked = [], farEnough = (x, z) => picked.every(p => Math.hypot(p.x - x, p.z - z) > 1.0);
+    PADS.forEach((pd, c) => {
+      const want = 11 + Math.floor(rnd() * 3);
+      let got = 0;
+      for (let t = 0; t < 2000 && got < want; t++) {
+        const a2 = rnd() * 6.283, d = Math.sqrt(rnd()) * (PAD_FLAT - 0.3), x = pd.x + d * Math.cos(a2), z = pd.z + d * Math.sin(a2);
+        if (farEnough(x, z)) { picked.push({ x, z, y: plainH(x, z), c }); got++; }
+      }
+    });
+    const houseBodies = new THREE.InstancedMesh(bodyGeo, houseMats.body, picked.length);
+    const houseRoofs = new THREE.InstancedMesh(roofGeo, houseMats.roof, picked.length);
+    const hDummy = new THREE.Object3D();
+    picked.forEach(({ x, z, y, c }, idx) => {
+      const ry = rnd() * Math.PI / 2;
+      const K = HOUSE_K;
+      hDummy.scale.setScalar(K);
+      hDummy.position.set(x, y - 0.05 + 0.15 * K, z);
+      hDummy.rotation.set(0, ry, 0);
+      hDummy.updateMatrix();
+      houseBodies.setMatrixAt(idx, hDummy.matrix);
+
+      hDummy.position.set(x, y - 0.05 + 0.3 * K + 0.125 * K, z);
+      hDummy.rotation.set(0, ry + Math.PI / 4, 0);
+      hDummy.updateMatrix();
+      houseRoofs.setMatrixAt(idx, hDummy.matrix);
+
+      villageHouses.push({ y, f: false, x, z, c });
+    });
+    houseBodies.instanceMatrix.needsUpdate = true;
+    houseRoofs.instanceMatrix.needsUpdate = true;
+    scene.add(houseBodies, houseRoofs);
+    villageHouses.forEach((h, i) => { if (h.y > villageHouses[topIdx].y) topIdx = i; });
+    const top = villageHouses[topIdx];
+    LMAX = 0.40;
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0x444444 }));
+    pole.position.set(top.x, top.y + 1.1, top.z);
+    const flagRed = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.065, 0.012), new THREE.MeshStandardMaterial({ color: 0xd63a2c, emissive: 0x551008 }));
+    flagRed.position.set(top.x + 0.12, top.y + 1.3125, top.z);
+    const flagWhite = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.065, 0.012), new THREE.MeshStandardMaterial({ color: 0xfafafa, emissive: 0x222222 }));
+    flagWhite.position.set(top.x + 0.12, top.y + 1.2475, top.z);
+    scene.add(pole, flagRed, flagWhite);
+  }
+  let lastHouseCount = -1, lastWaterLevel = -1, topMsg = false;
+  const floodedPads = new Set();
+  function updateHouses(level) {
+    if (Math.abs(level - lastWaterLevel) < 1e-4) return;
+    lastWaterLevel = level;
+    floodedPads.clear();
+    villageHouses.forEach(h => {
+      h.f = level > h.y + 0.05;
+      if (h.f) floodedPads.add(h.c);
+    });
+    const n = floodedPads.size;
+    if (n !== lastHouseCount) { lastHouseCount = n; $('hs').textContent = n + ' / ' + PADS.length; }
+    const t = villageHouses[topIdx];
+    if (t.f && !topMsg) { topMsg = true; say('Rumah tertinggi (bendera merah putih) terendam: banjir terparah.'); }
+    if (!t.f) topMsg = false;
+  }
+
+  /* air banjir */
+  const waterGeo = new THREE.CircleGeometry(LR - 0.02, 64).rotateX(-Math.PI / 2);
+  const water = new THREE.Mesh(
+    waterGeo,
+    new THREE.MeshStandardMaterial({ color: 0x588a9e, transparent: true, opacity: 0.68, depthWrite: false })
+  );
+  water.visible = false;
+  scene.add(water);
+
+  /* ====================== POHON ====================== */
+  function randPoint(i) {
+    const ring = Math.floor(i / NS), sec = i % NS;
+    const r = R * (ring + 0.1 + Math.random() * 0.8) / NR;
+    const a = (sec + 0.1 + Math.random() * 0.8) * Math.PI * 2 / NS;
+    const x = r * Math.cos(a), z = r * Math.sin(a);
+    return { x, y: meshY(x, z), z, r, a };
+  }
+
+  const treeData = [], cellTrees = [];
+  for (let i = 0; i < N; i++) {
+    const ring = Math.floor(i / NS), n = 4 * ring + 9;
+    const start = treeData.length;
+    for (let t = 0; t < n; t++) {
+      const p = randPoint(i);
+      treeData.push({ cell: i, x: p.x, y: p.y, z: p.z, s: (0.8 + Math.random() * 0.5) * 1.25, ry: Math.random() * 6.28, shade: (Math.random() - 0.5) * 0.1 });
+    }
+    cellTrees.push([start, treeData.length]);
+  }
+
+  const folGeo = new THREE.ConeGeometry(0.2, 0.55, 6);
+  folGeo.translate(0, 0.18 + 0.275, 0);
+  const trkGeo = new THREE.CylinderGeometry(0.035, 0.05, 0.22, 5);
+  trkGeo.translate(0, 0.11, 0);
+  const foliage = new THREE.InstancedMesh(folGeo, new THREE.MeshStandardMaterial({ flatShading: true }), treeData.length);
+  const trunk = new THREE.InstancedMesh(trkGeo, new THREE.MeshStandardMaterial({ flatShading: true }), treeData.length);
+  scene.add(foliage, trunk);
+
+  {
+    const pts = [];
+    for (let t = 0; t < 6000 && pts.length < 160; t++) {
+      const an = Math.random() * Math.PI * 2, r = R + 0.9 + Math.random() * (LR - R - 1.4);
+      const x = r * Math.cos(an), z = r * Math.sin(an);
+      if (vnoise(x * 0.45 + 11, z * 0.45 - 4) < 0.45 && Math.random() < 0.9) continue;
+      if (PADS.some(pd => Math.hypot(x - pd.x, z - pd.z) < PAD_FLAT + 0.5)) continue;
+      if (pts.some(q => Math.hypot(q.x - x, q.z - z) < 0.45)) continue;
+      pts.push({ x, z });
+    }
+    const pf = new THREE.InstancedMesh(folGeo, new THREE.MeshStandardMaterial({ flatShading: true }), pts.length);
+    const pt = new THREE.InstancedMesh(trkGeo, new THREE.MeshStandardMaterial({ flatShading: true }), pts.length);
+    const o = new THREE.Object3D(), cl = new THREE.Color();
+    pts.forEach((q, i) => {
+      const sc = (0.8 + Math.random() * 0.5) * 1.2, y = plainH(q.x, q.z);
+      o.position.set(q.x, y, q.z); o.rotation.set(0, Math.random() * 6.28, 0); o.scale.set(sc, sc, sc); o.updateMatrix();
+      pf.setMatrixAt(i, o.matrix); pt.setMatrixAt(i, o.matrix);
+      pf.setColorAt(i, cl.setHex(0x2f7a35).offsetHSL((Math.random() - 0.5) * 0.03, 0, (Math.random() - 0.5) * 0.1));
+      pt.setColorAt(i, cl.setHex(0x6b4a2b));
+    });
+    scene.add(pf, pt);
+  }
+
+  const dummy = new THREE.Object3D();
+  const tcol = new THREE.Color();
+  const FOL_HEX = { h: 0x2f7a35, r: 0x8fcb5a, b: 0xff6a1a, x: 0x000000, g: 0x000000 };
+  const TRK_HEX = { h: 0x6b4a2b, r: 0x6b4a2b, b: 0xb03a10, x: 0x1a1816, g: 0x7a5230 };
+  const FOL_S = { h: 1, r: 0.5, b: 0.85, x: 0, g: 0 };
+  const TRK_SY = { h: 1, r: 0.5, b: 1, x: 1, g: 0.25 };
+
+  function refreshCellTreePos(i) {
+    const st = cells[i].st, gone = cells[i].gone;
+    const [a, b] = cellTrees[i];
+    const fsMul = gone ? 0 : FOL_S[st], sxzMul = st === 'r' ? 0.5 : 1, syMul = TRK_SY[st];
+    for (let idx = a; idx < b; idx++) {
+      const d = treeData[idx];
+      d.y = meshY(d.x, d.z);
+      const fs = Math.max(0.0001, d.s * fsMul);
+      dummy.position.set(d.x, d.y, d.z);
+      dummy.rotation.set(0, d.ry, 0);
+      dummy.scale.set(fs, fs, fs);
+      dummy.updateMatrix();
+      foliage.setMatrixAt(idx, dummy.matrix);
+      const sxz = d.s * sxzMul;
+      dummy.scale.set(gone ? 0.0001 : sxz, gone ? 0.0001 : d.s * syMul, gone ? 0.0001 : sxz);
+      dummy.updateMatrix();
+      trunk.setMatrixAt(idx, dummy.matrix);
+    }
+  }
+
+  function refreshCellTrees(i) {
+    const st = cells[i].st;
+    const [a, b] = cellTrees[i];
+    refreshCellTreePos(i);
+    for (let idx = a; idx < b; idx++) {
+      const d = treeData[idx];
+      foliage.setColorAt(idx, tcol.setHex(FOL_HEX[st]).offsetHSL(0, 0, d.shade));
+      trunk.setColorAt(idx, tcol.setHex(TRK_HEX[st]));
+    }
+    foliage.instanceMatrix.needsUpdate = true;
+    trunk.instanceMatrix.needsUpdate = true;
+    if (foliage.instanceColor) foliage.instanceColor.needsUpdate = true;
+    if (trunk.instanceColor) trunk.instanceColor.needsUpdate = true;
+    cells[i].vis = st;
+  }
+
+  /* ====================== WARNA TANAH ====================== */
+  const BASE = { h: new THREE.Color(0x5b8c3a), b: new THREE.Color(0xe0561c), x: new THREE.Color(0x2d2a27), g: new THREE.Color(0x9c6b36), r: new THREE.Color(0x93b958) };
+  const MUD = new THREE.Color(0x6b4a2b);
+  const FLAME = new THREE.Color(0xffb020);
+  const WHITE = new THREE.Color(0xffffff);
+  const cc = [];
+  for (let i = 0; i < N; i++) cc.push(new THREE.Color());
+
+  function updateColors(time) {
+    const hTwin = (hover >= 0 && hover < NS) ? (hover ^ 1) : -1;
+    for (let i = 0; i < N; i++) {
+      const c = cells[i];
+      const col = cc[i];
+      if (c.slide) col.copy(MUD);
+      else col.copy(BASE[c.st]);
+      if (c.st === 'b') col.lerp(FLAME, 0.5 + 0.5 * Math.sin(time * 8 + i * 1.7));
+      if (i === hover || i === hTwin) col.lerp(WHITE, 0.3);
+    }
+    const arr = colorAttr.array;
+    for (let f = 0; f < faceCell.length; f++) {
+      const col = cc[faceCell[f]], s = faceShade[f];
+      for (let v = 0; v < 3; v++) {
+        const o = (f * 3 + v) * 3;
+        arr[o] = col.r * s;
+        arr[o + 1] = col.g * s;
+        arr[o + 2] = col.b * s;
+      }
+    }
+    colorAttr.needsUpdate = true;
+  }
+
+  /* ====================== PARTIKEL ====================== */
+  function spriteTex() {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d');
+    const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)');
+    gr.addColorStop(0.4, 'rgba(255,255,255,0.6)');
+    gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  }
+  const TEX = spriteTex();
+
+  function makePool(n, size, blending, opacity) {
+    const pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) pos[i * 3 + 1] = -100;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({
+      size, map: TEX, vertexColors: true, transparent: true, opacity,
+      depthWrite: false, blending, sizeAttenuation: true
+    }));
+    pts.frustumCulled = false;
+    pts.visible = false;
+    scene.add(pts);
+    return { n, ptr: 0, active: 0, pts, pos, col, geo, life: new Float32Array(n), max: new Float32Array(n),
+      vx: new Float32Array(n), vy: new Float32Array(n), vz: new Float32Array(n) };
+  }
+  function spawn(p, x, y, z, vx, vy, vz, life) {
+    const i = p.ptr; p.ptr = (i + 1) % p.n;
+    if (p.life[i] <= 0) p.active++;
+    p.pts.visible = true;
+    p.pos[i * 3] = x; p.pos[i * 3 + 1] = y; p.pos[i * 3 + 2] = z;
+    p.vx[i] = vx; p.vy[i] = vy; p.vz[i] = vz;
+    p.life[i] = life; p.max[i] = life;
+  }
+  function stepPool(p, dt, colorFn) {
+    if (p.active <= 0) return;
+    let alive = 0;
+    for (let i = 0; i < p.n; i++) {
+      if (p.life[i] <= 0) continue;
+      p.life[i] -= dt;
+      if (p.life[i] <= 0) {
+        p.pos[i * 3 + 1] = -100;
+        p.col[i * 3] = p.col[i * 3 + 1] = p.col[i * 3 + 2] = 0;
+        continue;
+      }
+      alive++;
+      p.pos[i * 3] += p.vx[i] * dt;
+      p.pos[i * 3 + 1] += p.vy[i] * dt;
+      p.pos[i * 3 + 2] += p.vz[i] * dt;
+      colorFn(p.life[i] / p.max[i], i, p.col);
+    }
+    p.active = alive;
+    p.pts.visible = alive > 0;
+    p.geo.attributes.position.needsUpdate = true;
+    p.geo.attributes.color.needsUpdate = true;
+  }
+  function clearPool(p) {
+    p.life.fill(0);
+    p.active = 0;
+    p.pts.visible = false;
+    for (let i = 0; i < p.n; i++) { p.pos[i * 3 + 1] = -100; p.col[i * 3] = p.col[i * 3 + 1] = p.col[i * 3 + 2] = 0; }
+    p.geo.attributes.position.needsUpdate = true;
+    p.geo.attributes.color.needsUpdate = true;
+  }
+
+  const flames = makePool(1500, 0.55, THREE.AdditiveBlending, 1);
+  const smoke = makePool(1200, 1.15, THREE.NormalBlending, 0.58);
+  const mud = makePool(800, 0.16, THREE.NormalBlending, 0.95);
+  const mudVel = new Float32Array(800);
+
+  const RN = 5200, RAIN_H = 25;
+  const rainPos = new Float32Array(RN * 6);
+  const rd = [];
+  for (let i = 0; i < RN; i++) rd.push({ x: Math.random() * 64 - 32, y: Math.random() * RAIN_H, z: Math.random() * 64 - 32, v: 14 + Math.random() * 8 });
+  const rainGeo = new THREE.BufferGeometry();
+  rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+  const rainMat = new THREE.LineBasicMaterial({ color: 0xaed6f1, transparent: true, opacity: 0 });
+  const rainLines = new THREE.LineSegments(rainGeo, rainMat);
+  rainLines.frustumCulled = false;
+  rainLines.visible = false;
+  scene.add(rainLines);
+
+  /* ====================== LOGIKA ====================== */
+  const $ = id => document.getElementById(id);
+  function say(t) { $('msg').textContent = t; }
+
+  function nb(i) {
+    const ring = Math.floor(i / NS), s = i % NS, o = [];
+    o.push(ring * NS + (s + 1) % NS);
+    o.push(ring * NS + (s + NS - 1) % NS);
+    if (ring > 0) o.push((ring - 1) * NS + s);
+    if (ring < NR - 1) o.push((ring + 1) * NS + s);
+    return o;
+  }
+
+  function applyAct(i) {
+    const c = cells[i], raining = Date.now() < rainUntil;
+    if (tool === 'fire') {
+      if (raining) return say('Tanah basah, api tak bisa menyala saat hujan.');
+      if (c.st === 'h' || c.st === 'r') { c.st = 'b'; c.t = Date.now(); c.hop = 0; say('Api menyala, asap naik dan kualitas udara memburuk.'); }
+      else if (c.st === 'b') say('Area ini sudah terbakar.');
+      else say('Tidak ada yang bisa dibakar di sini.');
+    } else if (tool === 'saw') {
+      if (c.st === 'b') return say('Area sedang terbakar, tidak bisa ditebang.');
+      if (c.st === 'h' || c.st === 'r') {
+        c.st = 'g';
+        const r = handleLoggingAnimals(i);
+        if (r.killed > 0) say('Hutan gundul. Sebagian satwa mati tertimpa pohon, sisanya mengungsi.');
+        else if (r.fled > 0) say('Hutan gundul. Satwa mengungsi ke hutan terdekat.');
+        else say('Hutan gundul. Tanah tak lagi menahan air hujan.');
+      } else say('Area ini sudah tidak berhutan.');
+    } else if (tool === 'plant') {
+      if (c.st === 'b') return say('Tunggu api padam dulu.');
+      if (c.st === 'x' || c.st === 'g') {
+        c.st = 'r'; c.slide = false; c.gone = false;
+        let reconnected = false;
+        for (const a of animals) {
+          if (a.state !== 'dead' && a.state !== 'gone' && a.starveT < 10) {
+            a.starveT = 14 + Math.random() * 4;
+            reconnected = true;
+          }
+        }
+        if (reconnected) {
+          say('Koridor hutan tersambung! Satwa selamat dari kelaparan.');
+        } else {
+          say('Reboisasi dimulai. Hutan pulih lebih lambat dari rusaknya.');
+        }
+      } else say('Area ini masih berhutan.');
+    }
+  }
+  function act(i) {
+    applyAct(i);
+    if (i < NS) applyAct(i ^ 1);
+    dirty = true;
+  }
+
+  let lastCat = '', lastCovPct = -1;
+  function tick() {
+    const now = Date.now(), raining = now < rainUntil;
+    for (let i = 0; i < N; i++) {
+      const c = cells[i];
+      if (c.st === 'b') {
+        if (i < NS && cells[i ^ 1].st !== 'b') {
+          cells[i ^ 1].st = 'b'; cells[i ^ 1].t = c.t; cells[i ^ 1].hop = c.hop;
+        }
+        if ((raining && Math.random() < 0.2) || now - c.t > BURN_MS) {
+          c.st = 'x';
+          if (i < NS) cells[i ^ 1].st = 'x';
+        }
+        else if (!raining && (c.hop || 0) < FIRE_MAX_HOPS) {
+          nb(i).forEach(j => {
+            const n = cells[j];
+            if ((n.st === 'h' || n.st === 'r') && Math.random() < FIRE_SPREAD_CHANCE) {
+              n.st = 'b'; n.t = now; n.hop = (c.hop || 0) + 1;
+              if (j < NS) { cells[j ^ 1].st = 'b'; cells[j ^ 1].t = now; cells[j ^ 1].hop = n.hop; }
+            }
+          });
+        }
+      }
+      if (raining && now - rainStart > SLIDE_DELAY_MS && (c.st === 'x' || c.st === 'g') && Math.floor(i / NS) <= 3 && Math.random() < 0.1) {
+        if (!c.slide) {
+          startSlide(i);
+          if (i < NS && !cells[i ^ 1].slide) startSlide(i ^ 1);
+        }
+        c.slide = true;
+        if (i < NS) cells[i ^ 1].slide = true;
+      }
+    }
+
+    let burn = 0, healthy = 0, bad = 0, sl = 0, cov = 0;
+    cells.forEach(c => {
+      if (c.st === 'b') burn++;
+      if (c.st === 'h') { healthy++; cov += 1; }
+      if (c.st === 'r') cov += 0.6;
+      if (c.st === 'x' || c.st === 'g') bad++;
+      if (c.slide) sl++;
+    });
+
+    if (raining) {
+      if (now - rainStart > FLOOD_DELAY_MS) {
+        const tgt = Math.max(0, Math.min(1, (bad - healthy * 0.25) / 50));
+        flood += (tgt - flood) * 0.12;
+      }
+    } else {
+      flood = Math.max(0, flood - 0.01);
+    }
+
+    if (burn > 0) {
+      // Selama masih ada api menyala, batalkan timer pemulihan & tahan kualitas udara agar tidak membaik sebelum api terakhir padam
+      smokeClearElapsed = 0;
+      smokeClearFrom = 25;
+      lastAirTick = now;
+      if (!raining) {
+        const target = 25 + burn * 15 + Math.max(0, burn - 11) * 6;
+        if (target > airLevel) airLevel += (target - airLevel) * 0.1;
+      }
+    } else if (airLevel <= 25.2) {
+      airLevel = 25;
+      smokeClearElapsed = 0;
+      smokeClearFrom = 25;
+      lastAirTick = now;
+    } else {
+      if (smokeClearFrom <= 25.2) {
+        smokeClearFrom = airLevel;
+        smokeClearElapsed = 0;
+        const sev = Math.max(0, Math.min(1, (smokeClearFrom - 25) / 275));
+        smokeClearDur = SMOKE_CLEAR_MIN_MS + sev * (SMOKE_CLEAR_MAX_MS - SMOKE_CLEAR_MIN_MS);
+        lastAirTick = now;
+      } else {
+        const tickDt = Math.max(0, now - lastAirTick);
+        lastAirTick = now;
+        smokeClearElapsed += tickDt * (raining ? RAIN_WASH_MULT : 1);
+        const p = Math.min(1, smokeClearElapsed / smokeClearDur);
+        const eased = p * p * (3 - 2 * p);
+        airLevel = smokeClearFrom + (25 - smokeClearFrom) * eased;
+        if (p >= 1) {
+          airLevel = 25;
+          smokeClearFrom = 25;
+          smokeClearElapsed = 0;
+        }
+      }
+    }
+
+    if (prevBurn > 0 && burn === 0 && !raining) {
+      say(airLevel > 100
+        ? 'Api padam, tapi kabut asap masih pekat dan butuh waktu untuk terurai.'
+        : 'Api padam dan udara membaik, tapi hutan tetap hangus.');
+    }
+    prevBurn = burn;
+
+    if (wasRain && !raining) {
+      say(sl > 0 || flood > 0.3
+        ? 'Hujan reda. Lahan gundul memicu longsor & banjir di desa.'
+        : 'Hujan reda. Hutan sehat menyerap air, desa aman.');
+    }
+    wasRain = raining;
+    dirty = true;
+
+    /* HUD */
+    const a = Math.round(airLevel);
+    let t, bg, fg;
+    if (a <= 50) { t = 'Baik'; bg = 'rgba(143, 203, 90, 0.18)'; fg = '#8fcb5a'; }
+    else if (a <= 100) { t = 'Sedang'; bg = 'rgba(242, 169, 59, 0.20)'; fg = '#f2a93b'; }
+    else if (a <= 150) { t = 'Kurang baik'; bg = 'rgba(242, 169, 59, 0.22)'; fg = '#f2a93b'; }
+    else if (a <= 200) { t = 'Buruk'; bg = 'rgba(224, 86, 28, 0.24)'; fg = '#ff7b47'; }
+    else if (a <= 300) { t = 'Sangat buruk'; bg = 'rgba(224, 86, 28, 0.28)'; fg = '#ff7b47'; }
+    else { t = 'Berbahaya'; bg = 'rgba(224, 86, 28, 0.34)'; fg = '#ff7b47'; }
+    if (t !== lastCat) {
+      lastCat = t;
+      const cat = $('cat');
+      cat.textContent = t; cat.style.background = bg; cat.style.color = fg;
+    }
+    const covPct = Math.round(cov / N * 100);
+    if (covPct !== lastCovPct) { lastCovPct = covPct; $('cover').textContent = covPct + '%'; }
+    updateWildHUD();
+  }
+
+  function resetAll() {
+    initCells();
+    flood = 0; airLevel = 25; smoothAir = 25; prevBurn = 0; rainStart = 0; rainUntil = 0; wasRain = false; hover = -1; dirty = true;
+    smokeClearElapsed = 0; smokeClearFrom = 25; smokeClearDur = SMOKE_CLEAR_MIN_MS; lastAirTick = 0;
+    clearPool(flames); clearPool(smoke); clearPool(mud);
+    resetTerrain(); initAnimals(); updateWildHUD(); updateHoverLabel();
+  }
+
+  /* ====================== INPUT ====================== */
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  const el = renderer.domElement;
+
+  function pick(e) {
+    const r = el.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    const hits = raycaster.intersectObject(mountain);
+    return hits.length ? faceCell[hits[0].faceIndex] : -1;
+  }
+
+  function areaName(i) {
+    const ring = Math.floor(i / NS), sec = i % NS;
+    if (ring === 0) {
+      const pair = Math.floor(sec / 2) + 1;
+      return 'Puncak (Zona ' + pair + ')';
+    }
+    const r = R * (ring + 0.5) / NR, a = (sec + 0.5) * Math.PI * 2 / NS;
+    const h = hgt(r * Math.cos(a), r * Math.sin(a));
+    const hh = h - B; return hh > 2.4 * HS ? 'Puncak' : hh > 1.4 * HS ? 'Lereng atas' : hh > 0.5 * HS ? 'Lereng tengah' : 'Kaki gunung';
+  }
+  const ST_NAME = { h: 'sehat', b: 'terbakar', x: 'hangus', g: 'gundul', r: 'pulih' };
+  let lastHoverText = '';
+  function updateHoverLabel() {
+    const h = $('hover');
+    if (hover < 0) {
+      if (lastHoverText !== '') { lastHoverText = ''; h.style.display = 'none'; }
+      return;
+    }
+    const c = cells[hover];
+    const txt = areaName(hover) + ' \u00b7 ' + ST_NAME[c.st] + (c.slide ? ' \u00b7 longsor' : '');
+    if (txt !== lastHoverText) {
+      lastHoverText = txt;
+      h.style.display = 'block';
+      h.textContent = txt;
+    }
+  }
+
+  let down = null;
+  el.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+  el.addEventListener('pointerup', e => {
+    if (!down) return;
+    const d = Math.hypot(e.clientX - down.x, e.clientY - down.y), dt = performance.now() - down.t;
+    down = null;
+    if (d < 6 && dt < 600) {
+      const i = pick(e);
+      if (i >= 0) { act(i); hover = i; updateHoverLabel(); }
+    }
+  });
+  let hoverRaf = 0, lastMoveEvent = null;
+  el.addEventListener('pointermove', e => {
+    if (e.pointerType === 'touch' || e.buttons) return;
+    lastMoveEvent = e;
+    if (!hoverRaf) {
+      hoverRaf = requestAnimationFrame(() => {
+        hoverRaf = 0;
+        if (!lastMoveEvent) return;
+        const i = pick(lastMoveEvent);
+        if (i !== hover) { hover = i; dirty = true; updateHoverLabel(); el.style.cursor = i >= 0 ? 'pointer' : 'grab'; }
+      });
+    }
+  });
+  el.addEventListener('pointerleave', () => { hover = -1; dirty = true; updateHoverLabel(); });
+
+  function setTool(t) {
+    tool = t;
+    ['fire', 'saw', 'plant'].forEach(k => $('t-' + k).classList.toggle('on', k === t));
+  }
+  $('t-fire').onclick = () => setTool('fire');
+  $('t-saw').onclick = () => setTool('saw');
+  $('t-plant').onclick = () => setTool('plant');
+  $('rain').onclick = () => {
+    if (Date.now() < rainUntil) return;
+    rainStart = Date.now(); rainUntil = rainStart + RAIN_MS;
+    say('Hujan turun 10 detik. Amati dampaknya di lahan gundul.');
+  };
+  $('reset').onclick = () => { resetAll(); say('Gunung dikembalikan seperti awal.'); };
+
+  function onResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', onResize);
+
+  /* ====================== SATWA ====================== */
+  const N_MONKEY = 16, N_BIRD = 10;
+  const SPD = { monkey: [0.65, 2.2], bird: [1.15, 2.1] };
+  const WILD_N = (NR - 1) * NS;
+  const HAB = i => i < WILD_N && (cells[i].st === 'h' || cells[i].st === 'r');
+
+  function partGeo(geo, color, x, y, z, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1, ry = 0) {
+    const g = geo.index ? geo.toNonIndexed() : geo.clone();
+    g.deleteAttribute('uv'); g.scale(sx, sy, sz); g.rotateX(rx); g.rotateY(ry); g.rotateZ(rz); g.translate(x, y, z);
+    const n = g.attributes.position.count, c = new Float32Array(n * 3), col = new THREE.Color(color);
+    for (let i = 0; i < n; i++) { c[i * 3] = col.r; c[i * 3 + 1] = col.g; c[i * 3 + 2] = col.b; }
+    g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+    return g;
+  }
+  const BOXG = new THREE.BoxGeometry(1, 1, 1), SPHG = new THREE.SphereGeometry(1, 8, 6), CONG = new THREE.ConeGeometry(1, 1, 4);
+
+  const monkeyBodyGeo = mergeGeometries([
+    partGeo(SPHG, 0x7a4e2d, 0, 0.19, -0.04, 0, 0, 0.10, 0.095, 0.10),
+    partGeo(SPHG, 0x7a4e2d, 0, 0.29, 0.02, -0.55, 0, 0.105, 0.15, 0.095),
+    partGeo(SPHG, 0xa67c52, 0, 0.28, 0.06, -0.50, 0, 0.075, 0.11, 0.06),
+    partGeo(SPHG, 0x8b5e38, 0, 0.46, 0.10, 0, 0, 0.135, 0.13, 0.125),
+    partGeo(SPHG, 0x6b4423, 0, 0.56, 0.09, -0.2, 0, 0.06, 0.045, 0.06),
+    partGeo(SPHG, 0xe8c39e, -0.038, 0.48, 0.195, 0, 0, 0.055, 0.055, 0.03),
+    partGeo(SPHG, 0xe8c39e, 0.038, 0.48, 0.195, 0, 0, 0.055, 0.055, 0.03),
+    partGeo(SPHG, 0xe8c39e, 0, 0.425, 0.21, 0.1, 0, 0.07, 0.05, 0.045),
+    partGeo(SPHG, 0x1a1412, 0.042, 0.485, 0.22, 0, 0, 0.018, 0.018, 0.015),
+    partGeo(SPHG, 0x1a1412, -0.042, 0.485, 0.22, 0, 0, 0.018, 0.018, 0.015),
+    partGeo(SPHG, 0xe8c39e, 0.135, 0.46, 0.09, 0, 0, 0.045, 0.055, 0.022),
+    partGeo(SPHG, 0xe8c39e, -0.135, 0.46, 0.09, 0, 0, 0.045, 0.055, 0.022)
+  ]);
+  const monkeyLimbAGeo = mergeGeometries([
+    partGeo(BOXG, 0x5c3a1e, -0.095, -0.09, 0.09, -0.15, 0.08, 0.042, 0.25, 0.042),
+    partGeo(SPHG, 0xe8c39e, -0.105, -0.21, 0.12, 0, 0, 0.032, 0.022, 0.042),
+    partGeo(BOXG, 0x5c3a1e, 0.085, -0.11, -0.08, 0.2, -0.05, 0.048, 0.20, 0.048),
+    partGeo(SPHG, 0xe8c39e, 0.09, -0.21, -0.05, 0, 0, 0.034, 0.022, 0.048)
+  ]);
+  const monkeyLimbBGeo = mergeGeometries([
+    partGeo(BOXG, 0x5c3a1e, 0.095, -0.09, 0.09, -0.15, -0.08, 0.042, 0.25, 0.042),
+    partGeo(SPHG, 0xe8c39e, 0.105, -0.21, 0.12, 0, 0, 0.032, 0.022, 0.042),
+    partGeo(BOXG, 0x5c3a1e, -0.085, -0.11, -0.08, 0.2, 0.05, 0.048, 0.20, 0.048),
+    partGeo(SPHG, 0xe8c39e, -0.09, -0.21, -0.05, 0, 0, 0.034, 0.022, 0.048)
+  ]);
+  const monkeyTailGeo = mergeGeometries([
+    partGeo(BOXG, 0x5c3a1e, 0, 0.10, -0.07, 1.15, 0, 0.028, 0.028, 0.22),
+    partGeo(BOXG, 0x5c3a1e, 0, 0.27, -0.13, 1.48, 0, 0.025, 0.025, 0.22),
+    partGeo(BOXG, 0x5c3a1e, 0, 0.39, -0.08, 0.45, 0, 0.022, 0.022, 0.12),
+    partGeo(SPHG, 0x5c3a1e, 0, 0.36, -0.02, 0, 0, 0.026, 0.026, 0.026)
+  ]);
+
+  const birdBodyGeo = mergeGeometries([
+    partGeo(SPHG, 0x2563eb, 0, 0, 0, 0.1, 0, 0.09, 0.085, 0.17),
+    partGeo(SPHG, 0xeff6ff, 0, -0.025, 0.02, 0, 0, 0.075, 0.065, 0.14),
+    partGeo(SPHG, 0x1d4ed8, 0, 0.065, 0.15, 0, 0, 0.068, 0.068, 0.068),
+    partGeo(SPHG, 0x111827, 0.045, 0.08, 0.18, 0, 0, 0.014, 0.014, 0.014),
+    partGeo(SPHG, 0x111827, -0.045, 0.08, 0.18, 0, 0, 0.014, 0.014, 0.014),
+    partGeo(CONG, 0xf59e0b, 0, 0.06, 0.24, Math.PI / 2, 0, 0.028, 0.09, 0.028),
+    partGeo(BOXG, 0x1e40af, 0, 0.01, -0.21, 0.15, 0, 0.09, 0.018, 0.15)
+  ]);
+  const birdWingRGeo = mergeGeometries([
+    partGeo(BOXG, 0x3b82f6, 0.13, 0, 0.01, 0, -0.04, 0.26, 0.018, 0.13, -0.12),
+    partGeo(BOXG, 0x1d4ed8, 0.28, -0.01, -0.02, 0, -0.08, 0.16, 0.014, 0.09, -0.28)
+  ]);
+  const birdWingLGeo = mergeGeometries([
+    partGeo(BOXG, 0x3b82f6, -0.13, 0, 0.01, 0, 0.04, 0.26, 0.018, 0.13, 0.12),
+    partGeo(BOXG, 0x1d4ed8, -0.28, -0.01, -0.02, 0, 0.08, 0.16, 0.014, 0.09, 0.28)
+  ]);
+
+  const wildMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.8 });
+  const mkInst = (g, n) => { const m = new THREE.InstancedMesh(g, wildMat, n); m.frustumCulled = false; scene.add(m); return m; };
+  const monkeyBodyM = mkInst(monkeyBodyGeo, N_MONKEY);
+  const monkeyLimbAM = mkInst(monkeyLimbAGeo, N_MONKEY);
+  const monkeyLimbBM = mkInst(monkeyLimbBGeo, N_MONKEY);
+  const monkeyTailM = mkInst(monkeyTailGeo, N_MONKEY);
+  const birdBodyM = mkInst(birdBodyGeo, N_BIRD);
+  const birdWingRM = mkInst(birdWingRGeo, N_BIRD);
+  const birdWingLM = mkInst(birdWingLGeo, N_BIRD);
+  const ALL_WILD_MESHES = [monkeyBodyM, monkeyLimbAM, monkeyLimbBM, monkeyTailM, birdBodyM, birdWingRM, birdWingLM];
+
+  const CCX = [], CCZ = [];
+  for (let i = 0; i < N; i++) {
+    const ring = Math.floor(i / NS), sec = i % NS, r = R * (ring + 0.5) / NR, a = (sec + 0.5) * Math.PI * 2 / NS;
+    CCX.push(r * Math.cos(a)); CCZ.push(r * Math.sin(a));
+  }
+  function cellAt(x, z) {
+    const r = Math.hypot(x, z); let a = Math.atan2(z, x); if (a < 0) a += Math.PI * 2;
+    return Math.min(NR - 1, Math.floor(r / R * NR)) * NS + Math.floor(a / (Math.PI * 2) * NS) % NS;
+  }
+  const animals = [];
+  const wildFlags = { flee: false, fire: false, none: false, logging: false, isolated: false, starve: false, crossing: false, birdFly: false };
+  function initAnimals() {
+    animals.length = 0; wildFlags.flee = wildFlags.fire = wildFlags.none = wildFlags.logging = wildFlags.isolated = wildFlags.starve = wildFlags.crossing = wildFlags.birdFly = false;
+    for (let k = 0; k < N_MONKEY + N_BIRD; k++) {
+      const bird = k >= N_MONKEY, i = Math.floor(Math.random() * WILD_N), p = randPoint(i);
+      animals.push({ bird, idx: bird ? k - N_MONKEY : k, x: p.x, z: p.z, home: i, tx: p.x, tz: p.z, tc: i,
+        state: bird ? 'walk' : 'idle', timer: Math.random() * 2.5,
+        ry: Math.random() * 6.28, bank: 0, phase: Math.random() * 6.28, dt: 0, homeT: 2, fleeT: 0, sc: 1, tint: 1,
+        starveT: 14 + Math.random() * 4 });
+    }
+    const c = new THREE.Color(1, 1, 1);
+    for (const m of ALL_WILD_MESHES) { for (let i = 0; i < m.count; i++) m.setColorAt(i, c); if (m.instanceColor) m.instanceColor.needsUpdate = true; }
+  }
+  function killAnimal(a, cause) {
+    a.state = 'dead'; a.dt = 0;
+    if (cause === 'fire' && !wildFlags.fire) { wildFlags.fire = true; say('Satwa mati terjebak kebakaran. Populasi tak kembali.'); }
+    if (cause === 'logging' && !wildFlags.logging) { wildFlags.logging = true; say('Sebagian satwa mati tertimpa pohon saat penebangan.'); }
+    if (cause === 'none' && !wildFlags.none) { wildFlags.none = true; say('Tak ada hutan tersisa: satwa mati kehilangan habitat.'); }
+    if (cause === 'starve' && !wildFlags.starve) { wildFlags.starve = true; say('Satwa di hutan terisolasi mati kelaparan.'); }
+    updateWildHUD();
+  }
+  function getCluster(start) {
+    if (!HAB(start)) return { size: 0, visited: new Uint8Array(WILD_N) };
+    const visited = new Uint8Array(WILD_N);
+    const queue = [start];
+    visited[start] = 1;
+    let size = 0;
+    while (queue.length > 0) {
+      const u = queue.pop();
+      size++;
+      if (size > 3) break;
+      for (const v of nb(u)) {
+        if (HAB(v) && !visited[v]) {
+          visited[v] = 1;
+          queue.push(v);
+        }
+      }
+    }
+    return { size, visited };
+  }
+  function getNearestOtherHabitat(fromCell, excludeSet) {
+    let best = -1, bd = 1e9;
+    for (let i = 0; i < WILD_N; i++) {
+      if (!HAB(i) || (Array.isArray(excludeSet) ? excludeSet.includes(i) : excludeSet[i])) continue;
+      const d = Math.hypot(CCX[i] - CCX[fromCell], CCZ[i] - CCZ[fromCell]);
+      if (d < bd) { bd = d; best = i; }
+    }
+    return { best, dist: bd };
+  }
+  const LOGGING_DEATH_PROB = { bird: 0.30, monkey: 0.40 }; // peluang kabur: 70% burung, 60% monyet
+  function handleLoggingAnimals(cellIdx) {
+    let killed = 0, fled = 0;
+    for (const a of animals) {
+      if (a.state === 'dead' || a.state === 'gone') continue;
+      if (cellAt(a.x, a.z) === cellIdx) {
+        const pDeath = a.bird ? LOGGING_DEATH_PROB.bird : LOGGING_DEATH_PROB.monkey;
+        if (Math.random() < pDeath) { killAnimal(a, 'logging'); killed++; }
+        else { startFlee(a); fled++; }
+      } else if (a.tc === cellIdx) {
+        startFlee(a);
+        fled++;
+      }
+    }
+    return { killed, fled };
+  }
+  function randAnimalPoint(i) {
+    const ring = Math.floor(i / NS), sec = i % NS;
+    const r = R * (ring + 0.18 + Math.random() * 0.64) / NR;
+    const a = (sec + 0.18 + Math.random() * 0.64) * Math.PI * 2 / NS;
+    const x = r * Math.cos(a), z = r * Math.sin(a);
+    return { x, y: meshY(x, z), z, r, a };
+  }
+  function startFlee(a) {
+    const cur = cellAt(a.x, a.z); let best = -1, bd = 1e9;
+    for (let i = 0; i < WILD_N; i++) {
+      if (!HAB(i) || i === cur) continue;
+      const d = Math.hypot(CCX[i] - a.x, CCZ[i] - a.z); if (d < bd) { bd = d; best = i; }
+    }
+    if (best < 0) return killAnimal(a, 'none');
+    const p = randAnimalPoint(best); a.tc = best; a.tx = p.x; a.tz = p.z; a.state = 'flee'; a.fleeT = 0.8;
+    if (!wildFlags.flee) { wildFlags.flee = true; say('Satwa mengungsi ke hutan terdekat.'); }
+  }
+  function pickWander(a) {
+    const cur = cellAt(a.x, a.z); let c = cur;
+    const o = nb(cur).filter(j => HAB(j));
+    if (o.length > 0) {
+      if (a.bird || Math.random() < 0.45) c = o[Math.floor(Math.random() * o.length)];
+    } else {
+      const cluster = getCluster(cur);
+      const other = getNearestOtherHabitat(cur, cluster.visited);
+      if (a.bird && other.best >= 0) {
+        c = other.best;
+        if (!wildFlags.birdFly) {
+          wildFlags.birdFly = true;
+          say('Burung terbang dari hutan terisolasi ke hutan lain.');
+        }
+      } else if (!a.bird && other.best >= 0 && other.dist <= 5.8) {
+        const p = randAnimalPoint(other.best); a.tc = other.best; a.tx = p.x; a.tz = p.z;
+        a.state = 'flee'; a.fleeT = 2.5; a.starveT = 14 + Math.random() * 4;
+        if (!wildFlags.crossing) {
+          wildFlags.crossing = true;
+          say('Monyet menyeberangi lahan gundul ke hutan terdekat.');
+        }
+        return;
+      }
+    }
+    const p = randAnimalPoint(c); a.tc = c; a.tx = p.x; a.tz = p.z; a.state = 'walk';
+  }
+  function stepAnimals(dt, time) {
+    const root = stepAnimals.r || (stepAnimals.r = new THREE.Object3D());
+    const part = stepAnimals.p || (stepAnimals.p = new THREE.Object3D());
+    const mat = stepAnimals.m || (stepAnimals.m = new THREE.Matrix4());
+    const col = stepAnimals.c || (stepAnimals.c = new THREE.Color());
+    root.rotation.order = 'YXZ'; part.rotation.order = 'YXZ';
+
+    for (const a of animals) {
+      const cur = cellAt(a.x, a.z), st = cells[cur].st;
+      if (a.state !== 'dead' && a.state !== 'gone') {
+        if (st === 'b') killAnimal(a, 'fire');
+        else if ((st === 'g' || st === 'x' || cur >= WILD_N) && a.state !== 'flee') {
+          if (a.state !== 'walk' || !HAB(a.tc)) {
+            startFlee(a);
+          }
+        }
+      }
+      if (!a.bird && a.state !== 'dead' && a.state !== 'gone' && a.state !== 'flee') {
+        const habCell = HAB(cur) ? cur : (HAB(a.tc) ? a.tc : -1);
+        if (habCell >= 0 && nb(habCell).filter(j => HAB(j)).length === 0) {
+          const other = getNearestOtherHabitat(habCell, [habCell]);
+          if (other.dist > 5.8 || other.best < 0) {
+            if (!wildFlags.isolated) {
+              wildFlags.isolated = true;
+              say('Satwa terisolasi! Tanam koridor hutan sebelum satwa kelaparan.');
+            }
+            a.starveT -= dt;
+            if (a.starveT <= 0) killAnimal(a, 'starve');
+          } else {
+            a.starveT = 14 + Math.random() * 4;
+          }
+        } else if (habCell >= 0) {
+          a.starveT = 14 + Math.random() * 4;
+        }
+      }
+      let moving = false, turnDiff = 0;
+      if (a.state === 'idle') {
+        a.timer -= dt; a.homeT -= dt;
+        if (a.homeT <= 0) {
+          a.homeT = 2;
+          if (cur !== a.home && HAB(a.home)) { const p = randPoint(a.home); a.tc = a.home; a.tx = p.x; a.tz = p.z; a.state = 'walk'; a.fleeT = 0; }
+        }
+        if (a.state === 'idle' && a.timer <= 0) pickWander(a);
+      }
+      if (a.state === 'walk' || a.state === 'flee') {
+        if (!HAB(a.tc)) startFlee(a);
+        const dx = a.tx - a.x, dz = a.tz - a.z, d = Math.hypot(dx, dz), spd = SPD[a.bird ? 'bird' : 'monkey'][a.state === 'flee' ? 1 : 0];
+        if (d < (a.bird ? 0.45 : 0.15)) {
+          if (a.bird) {
+            if (cur !== a.home && HAB(a.home)) { const p = randPoint(a.home); a.tc = a.home; a.tx = p.x; a.tz = p.z; a.state = 'walk'; }
+            else pickWander(a);
+          } else {
+            a.state = 'idle'; a.timer = 1.0 + Math.random() * 2.2;
+          }
+        } else {
+          const m = Math.min(d, spd * dt); a.x += dx / d * m; a.z += dz / d * m; moving = true;
+          let da = Math.atan2(dx, dz) - a.ry; da = Math.atan2(Math.sin(da), Math.cos(da));
+          turnDiff = da;
+          a.ry += da * Math.min(1, dt * (a.bird ? 4.5 : 9));
+        }
+      }
+      a.bank += (Math.max(-0.55, Math.min(0.55, -turnDiff * 0.7)) - a.bank) * Math.min(1, dt * 6);
+
+      const gy = meshY(a.x, a.z);
+      let y = gy, pitch = 0, roll = 0, yaw = a.ry, sc = 1, tint = 1;
+      const fast = a.state === 'flee';
+      const side = (a.idx % 2 === 0) ? 1 : -1;
+      let deadFall = 0;
+
+      if (a.state === 'dead') {
+        a.dt += dt;
+        const fallT = Math.min(1, a.dt * 2.4);
+        deadFall = fallT * fallT * (3 - 2 * fallT);
+        tint = 1 - 0.52 * deadFall;
+        if (a.bird) {
+          roll = (Math.PI / 2) * deadFall;
+          y = gy + 1.15 * Math.pow(Math.max(0, 1 - a.dt * 1.6), 2) + 0.07;
+          pitch = Math.sin(a.dt * 8) * 0.4 * Math.max(0, 1 - a.dt * 1.6);
+        } else {
+          const span = 0.28;
+          const hx = -side * Math.cos(yaw) * span, hz = side * Math.sin(yaw) * span;
+          const gyHead = meshY(a.x + hx, a.z + hz);
+          const sideSlope = Math.atan2(gyHead - gy, span);
+          const groundContact = Math.min(gy, (gy + gyHead) * 0.52);
+          roll = side * (Math.PI * 0.46) * deadFall - side * sideSlope * 0.85 * deadFall;
+          pitch = 0.18 * deadFall;
+          y = groundContact + 0.065 * (1 - 0.15 * deadFall);
+        }
+      } else if (a.bird) {
+        const wFreq = fast ? 16 : 10;
+        const flapPhase = time * wFreq + a.phase;
+        y = gy + 1.15 + Math.sin(time * 2.2 + a.phase) * 0.16 - Math.sin(flapPhase) * 0.025;
+        pitch = Math.cos(time * 2.2 + a.phase) * 0.08 + (fast ? 0.12 : 0);
+        roll = a.bank;
+      } else {
+        const stepE = 0.2, sY = meshY(a.x + Math.sin(a.ry) * stepE, a.z + Math.cos(a.ry) * stepE);
+        const slopePitch = -Math.atan2(sY - gy, stepE) * 0.75;
+        if (moving) {
+          const freq = fast ? 17 : 10, g = time * freq + a.phase;
+          y = gy + Math.abs(Math.sin(g)) * (fast ? 0.11 : 0.055);
+          pitch = slopePitch + Math.cos(g * 2) * (fast ? 0.16 : 0.08);
+        } else {
+          const idleT = time * 2.2 + a.phase;
+          y = gy + Math.max(0, Math.sin(idleT * 1.7)) * 0.025;
+          pitch = slopePitch - 0.12 + Math.sin(idleT) * 0.05;
+          yaw = a.ry + Math.sin(idleT * 0.8) * 0.35;
+        }
+      }
+
+      const k = (a.bird ? 0.9 : 0.8) * sc;
+      root.position.set(a.x, y, a.z); root.rotation.set(pitch, yaw, roll); root.scale.set(k, k, k); root.updateMatrix();
+
+      if (a.bird) {
+        birdBodyM.setMatrixAt(a.idx, root.matrix);
+        if (a.state === 'dead' || a.state === 'gone') {
+          const fold = Math.min(1, a.dt * 3);
+          part.position.set(0.04, 0.0, -0.02 * fold); part.rotation.set(-0.15 * fold, -1.15 * fold, -1.1 * fold); part.scale.set(1 - 0.25 * fold, 1, 1); part.updateMatrix();
+          mat.multiplyMatrices(root.matrix, part.matrix); birdWingRM.setMatrixAt(a.idx, mat);
+          part.position.set(-0.04, 0.0, -0.02 * fold); part.rotation.set(-0.15 * fold, 1.15 * fold, 1.1 * fold); part.updateMatrix();
+          mat.multiplyMatrices(root.matrix, part.matrix); birdWingLM.setMatrixAt(a.idx, mat);
+        } else {
+          const wFreq = fast ? 16 : 10;
+          const flap = Math.sin(time * wFreq + a.phase) * (fast ? 0.72 : 0.58) + 0.1;
+          part.position.set(0.05, 0.02, 0.01); part.rotation.set(0, 0, flap); part.scale.set(1, 1, 1); part.updateMatrix();
+          mat.multiplyMatrices(root.matrix, part.matrix); birdWingRM.setMatrixAt(a.idx, mat);
+          part.position.set(-0.05, 0.02, 0.01); part.rotation.set(0, 0, -flap); part.scale.set(1, 1, 1); part.updateMatrix();
+          mat.multiplyMatrices(root.matrix, part.matrix); birdWingLM.setMatrixAt(a.idx, mat);
+        }
+        if (tint !== a.tint) {
+          a.tint = tint; col.setScalar(tint);
+          birdBodyM.setColorAt(a.idx, col); birdWingRM.setColorAt(a.idx, col); birdWingLM.setColorAt(a.idx, col);
+          birdBodyM.instanceColor.needsUpdate = birdWingRM.instanceColor.needsUpdate = birdWingLM.instanceColor.needsUpdate = true;
+        }
+      } else {
+        monkeyBodyM.setMatrixAt(a.idx, root.matrix);
+        const isDead = a.state === 'dead' || a.state === 'gone';
+        const freq = fast ? 17 : 10, swing = moving ? Math.sin(time * freq + a.phase) * (fast ? 0.8 : 0.52) : 0;
+        const limbARx = isDead ? 0.68 * deadFall : swing;
+        const limbBRx = isDead ? -0.42 * deadFall : -swing;
+        const limbRz = isDead ? side * 0.24 * deadFall : 0;
+        part.position.set(0, 0.22, 0); part.rotation.set(limbARx, 0, limbRz); part.scale.set(1, 1, 1); part.updateMatrix();
+        mat.multiplyMatrices(root.matrix, part.matrix); monkeyLimbAM.setMatrixAt(a.idx, mat);
+        part.rotation.set(limbBRx, 0, -limbRz * 0.85); part.updateMatrix();
+        mat.multiplyMatrices(root.matrix, part.matrix); monkeyLimbBM.setMatrixAt(a.idx, mat);
+        const tailRx = isDead ? -1.1 * deadFall : (moving ? Math.cos(time * freq + a.phase) * 0.2 : Math.sin(time * 2 + a.phase) * 0.1);
+        const tailRy = isDead ? side * 0.35 * deadFall : Math.sin(time * (moving ? 8 : 3.2) + a.phase) * 0.4;
+        const tailRz = isDead ? side * 0.45 * deadFall : 0;
+        part.position.set(0, 0.18, -0.11); part.rotation.set(tailRx, tailRy, tailRz); part.updateMatrix();
+        mat.multiplyMatrices(root.matrix, part.matrix); monkeyTailM.setMatrixAt(a.idx, mat);
+        if (tint !== a.tint) {
+          a.tint = tint; col.setScalar(tint);
+          monkeyBodyM.setColorAt(a.idx, col); monkeyLimbAM.setColorAt(a.idx, col); monkeyLimbBM.setColorAt(a.idx, col); monkeyTailM.setColorAt(a.idx, col);
+          monkeyBodyM.instanceColor.needsUpdate = monkeyLimbAM.instanceColor.needsUpdate = monkeyLimbBM.instanceColor.needsUpdate = monkeyTailM.instanceColor.needsUpdate = true;
+        }
+      }
+    }
+    for (const m of ALL_WILD_MESHES) m.instanceMatrix.needsUpdate = true;
+  }
+
+  let lastAlive = -1;
+  function updateWildHUD() {
+    let alive = 0; for (const a of animals) if (a.state !== 'dead' && a.state !== 'gone') alive++;
+    if (alive !== lastAlive) { lastAlive = alive; $('wild').textContent = alive + ' / ' + animals.length; }
+  }
+  initAnimals();
+
+  const clock = new THREE.Clock();
+  let lastSkyHex = '';
+  let rafId = 0;
+  const flameCol = (u, i, col) => {
+    const f = Math.min(1, u * 1.6);
+    col[i * 3] = f; col[i * 3 + 1] = (0.3 + 0.5 * u) * f; col[i * 3 + 2] = 0.05 * f;
+  };
+  const smokeCol = (u, i, col) => {
+    const g = 0.3, k = 1 - u;
+    col[i * 3] = g + (sky.r - g) * k; col[i * 3 + 1] = g + (sky.g - g) * k; col[i * 3 + 2] = g + (sky.b - g) * k;
+  };
+  const mudCol = (u, i, col) => { col[i * 3] = 0.42; col[i * 3 + 1] = 0.29; col[i * 3 + 2] = 0.17; };
+
+  function animate() {
+    rafId = requestAnimationFrame(animate);
+    if (document.hidden) {
+      clock.getDelta();
+      return;
+    }
+    const dt = Math.min(clock.getDelta(), 0.05), time = clock.elapsedTime;
+    const raining = Date.now() < rainUntil;
+    rainF += ((raining ? 1 : 0) - rainF) * Math.min(1, dt * 2);
+
+    let burning = 0;
+    for (let i = 0; i < N; i++) {
+      const c = cells[i];
+      if (c.vis !== c.st) refreshCellTrees(i);
+      if (c.st === 'b') {
+        burning++;
+        for (let k = 0; k < 1; k++) {
+          const p = randPoint(i);
+          spawn(flames, p.x, p.y + 0.05, p.z, (Math.random() - 0.5) * 0.3, 1.0 + Math.random() * 1.0, (Math.random() - 0.5) * 0.3, 0.5 + Math.random() * 0.6);
+        }
+        if (Math.random() < 0.35) {
+          const p = randPoint(i);
+          spawn(smoke, p.x, p.y + 0.3, p.z, (Math.random() - 0.5) * 0.3 + 0.15, 0.6 + Math.random() * 0.5, (Math.random() - 0.5) * 0.3, 2.5 + Math.random() * 1.5);
+        }
+      }
+    }
+
+    if (raining) {
+      for (let i = 0; i < N; i++) {
+        const c = cells[i];
+        const isBareSlope = (c.st === 'x' || c.st === 'g' || c.st === 'b') && Math.floor(i / NS) <= 3;
+        if (c.slide) {
+          if (Math.random() < 0.3) {
+            const p = randPoint(i);
+            const m = mud.ptr;
+            spawn(mud, p.x, p.y + 0.04, p.z, 0, 0, 0, 3);
+            mudVel[m] = 0.5 + Math.random() * 0.7;
+          }
+        } else if (isBareSlope) {
+          if (Math.random() < 0.18) {
+            const p = randPoint(i);
+            const m = mud.ptr;
+            spawn(mud, p.x, p.y + 0.04, p.z, 0, 0, 0, 3);
+            mudVel[m] = 0.35 + Math.random() * 0.55;
+          }
+        }
+      }
+    }
+    if (mud.active > 0) {
+      for (let i = 0; i < mud.n; i++) {
+        if (mud.life[i] <= 0) continue;
+        let x = mud.pos[i * 3], z = mud.pos[i * 3 + 2];
+        const e = 0.08;
+        const gx = hgt(x + e, z) - hgt(x - e, z), gz = hgt(x, z + e) - hgt(x, z - e);
+        const gl = Math.hypot(gx, gz);
+        let dx, dz;
+        if (gl < 0.002) { const rr = Math.hypot(x, z) || 1; dx = x / rr; dz = z / rr; }
+        else { dx = -gx / gl; dz = -gz / gl; }
+        x += dx * mudVel[i] * dt; z += dz * mudVel[i] * dt;
+        if (Math.hypot(x, z) > R + 0.9) { mud.life[i] = 0.0001; continue; }
+        mud.pos[i * 3] = x; mud.pos[i * 3 + 2] = z; mud.pos[i * 3 + 1] = ground(x, z) + 0.04;
+      }
+    }
+
+    stepSlides(dt);
+    stepAnimals(dt, time);
+    stepPool(flames, dt, flameCol);
+    stepPool(smoke, dt, smokeCol);
+    stepPool(mud, dt, mudCol);
+
+    rainLines.visible = rainF > 0.02;
+    rainMat.opacity = 0.55 * rainF;
+    if (rainLines.visible) {
+      for (let i = 0; i < RN; i++) {
+        const d = rd[i];
+        d.y -= d.v * dt;
+        if (d.y < 0) d.y += RAIN_H;
+        const o = i * 6;
+        rainPos[o] = d.x; rainPos[o + 1] = d.y; rainPos[o + 2] = d.z;
+        rainPos[o + 3] = d.x - 0.04; rainPos[o + 4] = d.y + 0.60; rainPos[o + 5] = d.z;
+      }
+      rainGeo.attributes.position.needsUpdate = true;
+    }
+
+    if (dirty || burning > 0) { updateColors(time); if (dirty) updateHoverLabel(); dirty = false; }
+
+    const level = flood * LMAX;
+    updateHouses(level);
+    water.visible = level > 0.01;
+    water.position.y = level;
+
+    smoothAir += (airLevel - smoothAir) * Math.min(1, dt * 6);
+    const smokeAmt = Math.max(0, Math.min(0.92, (smoothAir - 28) / 240));
+    const camDist = camera.position.distanceTo(controls.target);
+    sky.copy(SKY_CLEAR).lerp(SKY_RAIN, rainF * 0.7).lerp(SKY_SMOKE, smokeAmt);
+    scene.fog.color.copy(sky);
+    scene.fog.near = THREE.MathUtils.lerp(72, Math.max(1, camDist * 0.12), smokeAmt);
+    scene.fog.far = THREE.MathUtils.lerp(200, camDist * 1.35 + 14, smokeAmt);
+    const skyHex = '#' + sky.getHexString();
+    if (skyHex !== lastSkyHex) { lastSkyHex = skyHex; simRoot.style.backgroundColor = skyHex; }
+    const dim = Math.max(rainF * 0.6, smokeAmt);
+    sun.intensity = 1.15 - 0.55 * dim;
+    hemi.intensity = 0.95 - 0.25 * dim;
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  for (let i = 0; i < N; i++) refreshCellTrees(i);
+  const tickTimer = setInterval(tick, 200);
+  animate();
+
+  window.addEventListener('pagehide', () => {
+    cancelAnimationFrame(rafId);
+    clearInterval(tickTimer);
+    window.removeEventListener('resize', onResize);
+    controls.dispose();
+    renderer.dispose();
+  });
+}
+</script>
+
+<style>
+  .mountain-sim-wrap {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: #6ebce8;
+    font-family: var(--font-sans);
+    color: var(--color-cream);
+  }
+
+  /* Warm charcoal-brown top gradient behind fixed navbar, with smooth eased fade */
+  .mountain-sim-wrap::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 105px;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgba(28, 22, 18, 0.86) 0%,
+      rgba(34, 27, 23, 0.57) 35%,
+      rgba(38, 31, 27, 0.23) 63%,
+      rgba(38, 31, 27, 0.05) 84%,
+      rgba(38, 31, 27, 0) 100%
+    );
+  }
+
+  #app {
+    position: fixed;
+    inset: 0;
+  }
+
+  #app :global(canvas) {
+    display: block;
+    touch-action: none;
+  }
+
+  .card {
+    background: rgba(38, 31, 27, 0.84);
+    border: 1px solid rgba(252, 246, 236, 0.16);
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: var(--color-cream);
+  }
+
+  /* Offset below fixed ASHEN Navbar (85px desktop / 108px mobile) */
+  #tools {
+    position: fixed;
+    top: 96px;
+    left: 16px;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    max-width: calc(100% - 32px);
+    align-items: center;
+  }
+
+  #tools button {
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-cream);
+    background: rgba(22, 17, 14, 0.92);
+    border: 1.5px solid rgba(252, 246, 236, 0.38);
+    border-radius: var(--radius-pill);
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  #tools button:hover {
+    background: rgba(46, 37, 33, 0.95);
+    border-color: rgba(252, 246, 236, 0.65);
+  }
+
+  #tools button.on {
+    background: var(--color-cream);
+    color: var(--color-charcoal);
+    border-color: var(--color-cream);
+    font-weight: 600;
+  }
+
+  #tools #t-fire.on {
+    background: var(--color-ember);
+    border-color: var(--color-ember);
+    color: var(--color-cream);
+  }
+
+  #tools #t-saw.on {
+    background: #c47d3b;
+    border-color: #c47d3b;
+    color: var(--color-cream);
+  }
+
+  #tools #t-plant.on {
+    background: var(--color-leaf-accent);
+    border-color: var(--color-leaf-accent);
+    color: var(--color-charcoal-deep);
+  }
+
+  #tools #rain.on {
+    background: var(--color-water-accent);
+    border-color: var(--color-water-accent);
+    color: var(--color-cream);
+  }
+
+  #panel {
+    position: fixed;
+    top: 148px;
+    left: 16px;
+    z-index: 10;
+    width: 216px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .m .ic {
+    display: none;
+  }
+
+  .m .l {
+    font-size: 11.5px;
+    color: rgba(252, 246, 236, 0.66);
+  }
+
+  .m .v {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--color-cream);
+  }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    margin-top: 2px;
+  }
+
+  .air-pill {
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+    margin-top: 6px;
+  }
+
+  #msg {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 10;
+    font-size: 13.5px;
+    line-height: 1.45;
+    width: fit-content;
+    max-width: min(440px, calc(100vw - 180px));
+  }
+
+  #hover {
+    position: fixed;
+    top: 136px;
+    right: 16px;
+    z-index: 10;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    display: none;
+  }
+
+  #legend {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    margin-right: 7px;
+  }
+
+  #help {
+    position: fixed;
+    right: 16px;
+    top: 96px;
+    z-index: 10;
+    font-size: 11.5px;
+    color: rgba(252, 246, 236, 0.88);
+    background: rgba(38, 31, 27, 0.8);
+    border: 1px solid rgba(252, 246, 236, 0.14);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    text-align: right;
+  }
+
+  #help .sep {
+    margin: 0 5px;
+    opacity: 0.65;
+  }
+
+  @media (max-width: 780px) {
+    .mountain-sim-wrap::before {
+      height: 72px;
+    }
+
+    #tools {
+      top: 76px;
+      left: 8px;
+      right: 8px;
+      gap: 4px;
+    }
+
+    #tools button {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+
+    #panel {
+      top: auto;
+      bottom: 10px;
+      left: 8px;
+      right: 8px;
+      width: auto;
+      gap: 6px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      pointer-events: none;
+    }
+
+    #panel .card.m {
+      padding: 8px 11px;
+      border-radius: 11px;
+      background: rgba(38, 31, 27, 0.84);
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 3px;
+    }
+
+    .m .ic {
+      display: none;
+    }
+
+    .m .l {
+      display: block;
+      font-size: 10.5px;
+      line-height: 1.25;
+      color: rgba(252, 246, 236, 0.68);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .m .v {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.15;
+    }
+
+    .pill,
+    .air-pill {
+      font-size: 11.5px;
+      padding: 2.5px 9px;
+      margin-top: 1px;
+    }
+
+    #msg,
+    #legend,
+    #help,
+    #hover {
+      display: none !important;
+    }
+  }
+</style>
