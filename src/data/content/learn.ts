@@ -76,7 +76,7 @@ export const learnContent: LearnContent = {
     subtitle:
       "Tonton rekaman demonstrasi singkat (Screen Record & Voice Over) tentang bagaimana model gunung 3D kami memvisualisasikan hubungan antara kebakaran hutan, kabut asap, penebangan liar, banjir, tanah longsor, dan perilaku satwa liar.",
     videoUrl: "/videos/ashen-3d-intro.mp4",
-    posterUrl: "/images/hero-fire.png",
+    posterUrl: "/images/hero-fire.avif",
     duration: "03:15",
     narratorNote:
       "Tip: Klik bab (chapter) di samping kanan untuk melompat ke penjelasan fitur tertentu pada video.",

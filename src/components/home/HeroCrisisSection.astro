@@ -10,7 +10,7 @@ const { hero } = homeContent;
       src={hero.image}
       alt="Kebakaran Hutan Indonesia"
       class="hero-bg-img parallax-media"
-      data-parallax="0.26"
+      data-parallax="0.20"
       fetchpriority="high"
       decoding="async"
     />
@@ -53,7 +53,7 @@ const { hero } = homeContent;
     display: grid;
     place-items: center;
     padding: 112px 24px 80px;
-    background-color: var(--color-fire-bg);
+    background-color: #0d0806;
     text-align: center;
   }
 
@@ -68,7 +68,7 @@ const { hero } = homeContent;
     width: 100%;
     height: 136%;
     object-fit: cover;
-    object-position: center 35%;
+    object-position: center 48%;
     position: absolute;
     top: -18%;
     left: 0;
@@ -79,13 +79,20 @@ const { hero } = homeContent;
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(24, 18, 14, 0.16) 0%,
-      rgba(24, 18, 14, 0.28) 52%,
-      rgba(24, 18, 14, 0.85) 86%,
-      #18120e 100%
-    );
+    background:
+      radial-gradient(
+        ellipse 68% 54% at 50% 48%,
+        rgba(12, 8, 6, 0.56) 0%,
+        rgba(12, 8, 6, 0.24) 62%,
+        transparent 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(12, 8, 6, 0.36) 0%,
+        rgba(12, 8, 6, 0.14) 45%,
+        rgba(12, 8, 6, 0.25) 86%,
+        #14100d 100%
+      );
   }
 
   .hero-center-stack {
@@ -102,7 +109,8 @@ const { hero } = homeContent;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--color-charcoal);
+    color: rgba(206, 193, 178, 0.86);
+    text-shadow: 0 2px 14px rgba(10, 6, 4, 0.75);
     margin-bottom: 12px;
   }
 
@@ -126,14 +134,16 @@ const { hero } = homeContent;
     line-height: 0.86;
     color: #ffffff;
     letter-spacing: 0;
+    text-shadow: 0 4px 28px rgba(10, 6, 4, 0.6);
   }
 
   .stack-metric {
     font-size: clamp(60px, 9.6vw, 134px);
     font-weight: 700;
     line-height: 0.86;
-    color: var(--color-ember);
+    color: #ff8c38;
     margin-top: -0.03em;
+    text-shadow: 0 4px 28px rgba(10, 6, 4, 0.75);
   }
 
   .hero-paragraph {
@@ -213,12 +223,12 @@ const { hero } = homeContent;
     height: 44px;
     padding: 0 24px;
     border-radius: 9999px;
-    background-color: rgba(46, 37, 33, 0.65);
-    border: 1px solid rgba(252, 246, 236, 0.28);
+    background-color: rgba(24, 18, 14, 0.84);
+    border: 1px solid rgba(252, 246, 236, 0.34);
     color: var(--color-cream);
     font-family: var(--font-sans);
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
@@ -226,8 +236,8 @@ const { hero } = homeContent;
   }
 
   .hero-btn-secondary:hover {
-    background-color: rgba(46, 37, 33, 0.9);
-    border-color: rgba(252, 246, 236, 0.6);
+    background-color: rgba(24, 18, 14, 0.96);
+    border-color: rgba(252, 246, 236, 0.65);
   }
 
   @media (max-width: 1024px) {

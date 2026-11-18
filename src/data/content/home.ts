@@ -65,12 +65,12 @@ export const homeContent: HomeContent = {
     headlineMetric: "TERBAKAR",
     description:
       "Memperkenalkan ASHEN, simulasi ekosistem hutan 3D interaktif yang memvisualisasikan rantai bencana kebakaran hutan, pembalakan liar, banjir bandang, tanah longsor, hingga krisis ruang hidup satwa.",
-    image: "/images/hero-fire.png",
+    image: "/images/hero-fire.avif",
     primaryCta: { label: "Simulasi 3D", href: "/simulasi" },
     secondaryCta: { label: "Belajar", href: "/belajar" }
   },
   natureStory: {
-    bgImage: "/images/nature-canopy.jpg",
+    bgImage: "/images/nature-canopy.avif",
     slides: [
       {
         lines: [
@@ -115,12 +115,12 @@ export const homeContent: HomeContent = {
     burned: {
       label: "Hutan terbakar",
       metricBig: "HANGUS",
-      image: "/images/forest-burned.jpg"
+      image: "/images/forest-burned.avif"
     },
     healthy: {
       label: "Hutan hujan sehat",
       metricBig: "RIMBUN",
-      image: "/images/forest-healthy.jpg"
+      image: "/images/forest-healthy.avif"
     }
   },
   domino: {
@@ -137,7 +137,7 @@ export const homeContent: HomeContent = {
         description:
           "Titik api merembet ke petak hutan tetangga, memancarkan asap pekat yang menurunkan kualitas udara ke level berbahaya.",
         diagramType: "fire",
-        image: "/images/domino-placeholder.jpg"
+        image: "/images/udara-berbahaya.avif"
       },
       {
         number: "02",
@@ -147,7 +147,7 @@ export const homeContent: HomeContent = {
         description:
           "Penebangan pohon merobohkan tajuk pelindung lereng gunung, menimpa satwa, dan menyisakan tanah gundul.",
         diagramType: "logging",
-        image: "/images/domino-placeholder.jpg"
+        image: "/images/tanah-gundul.avif"
       },
       {
         number: "03",
@@ -157,7 +157,7 @@ export const homeContent: HomeContent = {
         description:
           "Saat hujan mengguyur lereng gundul, tanah runtuh menjadi longsor dan luapan air merendam desa hingga rumah tertinggi.",
         diagramType: "flood",
-        image: "/images/domino-placeholder.jpg"
+        image: "/images/desa-terendam.avif"
       },
       {
         number: "04",
@@ -167,7 +167,7 @@ export const homeContent: HomeContent = {
         description:
           "Monyet dan burung yang terjebak di pulau hutan terisolasi tanpa koridor hijau perlahan mati kelaparan.",
         diagramType: "wildlife",
-        image: "/images/domino-placeholder.jpg"
+        image: "/images/satwa-terancam.avif"
       }
     ]
   },
@@ -175,7 +175,7 @@ export const homeContent: HomeContent = {
     eyebrow: "PEMULIHAN EKOSISTEM",
     headlineLines: ["PULIHKAN", "ALAM KITA"],
     body: "Hutan butuh puluhan tahun untuk pulih dari apa yang dihancurkan api dalam hitungan menit. Lewat reboisasi dan penyambungan koridor hijau, kita mengembalikan daya serap bumi, melindungi desa dari banjir-longsor, serta menyelamatkan satwa dari kepunahan.",
-    image: "/images/inspired-sunbeams.jpg",
+    image: "/images/inspired-pine.avif",
     cta: { label: "Coba Simulasi 3D", href: "/simulasi" },
     secondaryCta: { label: "Tonton Video & Berita", href: "/belajar" }
   }
