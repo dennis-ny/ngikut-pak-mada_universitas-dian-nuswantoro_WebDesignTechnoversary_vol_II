@@ -13,7 +13,6 @@ const slides = natureStory.slides;
         alt="Kanopi Hutan Tropis"
         class="nature-bg-img"
         id="nature-bg-img"
-        loading="lazy"
         decoding="async"
       />
       <div class="nature-bg-lighting"></div>
@@ -84,6 +83,7 @@ const slides = natureStory.slides;
   let targetEntry = 1;
   let currentEntry = 1;
   let lastActiveIdx = 0;
+  let lastRenderedP = -1;
   let rafRunning = false;
 
   function scheduleRender() {
@@ -127,59 +127,60 @@ const slides = natureStory.slides;
       const bgY = (1 - e) * 6 - p * 30;
       const entryScaleOffset = (1 - e) * 0.08;
       const bgScale = 1.14 + entryScaleOffset - p * 0.12;
-      const bgOpacity = 0.22 + e * 0.78;
       bgImg.style.transform = `translate3d(0, ${bgY.toFixed(3)}%, 0) scale(${bgScale.toFixed(4)})`;
-      bgImg.style.opacity = `${bgOpacity.toFixed(3)}`;
     }
 
-    const u = clamp((p - 0.06) / 0.64, 0, 1) * (TOTAL_STEPS - 1);
+    if (p !== lastRenderedP) {
+      lastRenderedP = p;
+      const u = clamp((p - 0.06) / 0.64, 0, 1) * (TOTAL_STEPS - 1);
 
-    const activeIdx = Math.round(clamp(u, 0, TOTAL_STEPS - 1));
-    if (activeIdx !== lastActiveIdx) {
-      lastActiveIdx = activeIdx;
-      stepItems.forEach((el, idx) => el.classList.toggle("is-active", idx === activeIdx));
-    }
-
-    subcaptions.forEach((el, s) => {
-      const d = u - s;
-      let op = 1;
-      let y = 0;
-      if (s > 0 && d < -0.22) {
-        const t = smoothstep(clamp((d - -0.44) / 0.22, 0, 1));
-        op = t;
-        y = (1 - t) * 8;
-      } else if (s < TOTAL_STEPS - 1 && d > 0.22) {
-        const t = smoothstep(clamp((d - 0.22) / 0.22, 0, 1));
-        op = 1 - t;
-        y = -t * 8;
+      const activeIdx = Math.round(clamp(u, 0, TOTAL_STEPS - 1));
+      if (activeIdx !== lastActiveIdx) {
+        lastActiveIdx = activeIdx;
+        stepItems.forEach((el, idx) => el.classList.toggle("is-active", idx === activeIdx));
       }
-      el.style.opacity = op.toFixed(3);
-      el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
-    });
 
-    for (let s = 0; s < TOTAL_STEPS; s++) {
-      const delta = u - s;
-      const lines = stepLines[s];
-
-      lines.forEach((el, lineIdx) => {
-        const stagger = lineIdx * 0.035;
-        const enterStart = -0.64 + stagger;
-        const enterEnd = -0.30 + stagger;
-        const exitStart = 0.30 + stagger;
-        const exitEnd = 0.64 + stagger;
-
-        let yPercent = 0;
-
-        if (delta < enterEnd) {
-          const rawEnter = clamp((delta - enterStart) / (enterEnd - enterStart), 0, 1);
-          yPercent = (1 - smoothstep(rawEnter)) * 125;
-        } else if (delta > exitStart) {
-          const rawExit = clamp((delta - exitStart) / (exitEnd - exitStart), 0, 1);
-          yPercent = -smoothstep(rawExit) * 125;
+      subcaptions.forEach((el, s) => {
+        const d = u - s;
+        let op = 1;
+        let y = 0;
+        if (s > 0 && d < -0.22) {
+          const t = smoothstep(clamp((d - -0.44) / 0.22, 0, 1));
+          op = t;
+          y = (1 - t) * 8;
+        } else if (s < TOTAL_STEPS - 1 && d > 0.22) {
+          const t = smoothstep(clamp((d - 0.22) / 0.22, 0, 1));
+          op = 1 - t;
+          y = -t * 8;
         }
-
-        el.style.transform = `translate3d(0, ${yPercent}%, 0)`;
+        el.style.opacity = op.toFixed(3);
+        el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
       });
+
+      for (let s = 0; s < TOTAL_STEPS; s++) {
+        const delta = u - s;
+        const lines = stepLines[s];
+
+        lines.forEach((el, lineIdx) => {
+          const stagger = lineIdx * 0.035;
+          const enterStart = -0.64 + stagger;
+          const enterEnd = -0.30 + stagger;
+          const exitStart = 0.30 + stagger;
+          const exitEnd = 0.64 + stagger;
+
+          let yPercent = 0;
+
+          if (delta < enterEnd) {
+            const rawEnter = clamp((delta - enterStart) / (enterEnd - enterStart), 0, 1);
+            yPercent = (1 - smoothstep(rawEnter)) * 125;
+          } else if (delta > exitStart) {
+            const rawExit = clamp((delta - exitStart) / (exitEnd - exitStart), 0, 1);
+            yPercent = -smoothstep(rawExit) * 125;
+          }
+
+          el.style.transform = `translate3d(0, ${yPercent}%, 0)`;
+        });
+      }
     }
 
     if (dimOverlay) {
@@ -221,6 +222,7 @@ const slides = natureStory.slides;
     height: 100vh;
     width: 100%;
     overflow: hidden;
+    contain: layout paint;
     display: grid;
     place-items: center;
   }
@@ -251,7 +253,6 @@ const slides = natureStory.slides;
     object-position: center;
     will-change: transform;
     transform: translate3d(0, 0, 0) scale(1.14);
-    filter: brightness(0.78) contrast(1.05) saturate(1.02);
   }
 
   /* Deep moody forest vignette for crisp headline contrast + warm corner sunlight glow */
@@ -313,13 +314,12 @@ const slides = natureStory.slides;
     transform: translate3d(0, 115%, 0);
   }
 
-  /* Clean Editorial Sub-caption below 3-line headline */
   .nature-subcaption-wrap {
     position: relative;
     width: 100%;
-    max-width: 520px;
-    min-height: 48px;
-    margin-top: 24px;
+    max-width: 600px;
+    min-height: 54px;
+    margin-top: 10px;
     display: grid;
     place-items: center;
   }
@@ -327,16 +327,15 @@ const slides = natureStory.slides;
   .nature-subcaption {
     grid-area: 1 / 1;
     font-family: var(--font-sans);
-    font-size: clamp(14px, 1.15vw, 16px);
+    font-size: clamp(16px, 1.35vw, 19px);
     font-weight: 400;
     line-height: 1.5;
-    color: rgba(252, 246, 236, 0.78);
+    color: rgba(252, 246, 236, 0.88);
     opacity: 0;
     will-change: opacity, transform;
     pointer-events: none;
   }
 
-  /* Minimal 01 - 04 Phase Indicator at Bottom */
   .nature-step-indicator {
     position: absolute;
     bottom: clamp(24px, 4vh, 40px);
@@ -345,15 +344,15 @@ const slides = natureStory.slides;
     z-index: 3;
     display: inline-flex;
     align-items: center;
-    gap: 14px;
+    gap: 18px;
   }
 
   .nature-step-item {
-    font-size: 12px;
+    font-size: clamp(14px, 1.15vw, 16px);
     letter-spacing: 0.08em;
-    color: rgba(252, 246, 236, 0.36);
-    padding-bottom: 4px;
-    border-bottom: 1.5px solid transparent;
+    color: rgba(252, 246, 236, 0.48);
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
     transition: color 0.3s ease, border-color 0.3s ease;
   }
 

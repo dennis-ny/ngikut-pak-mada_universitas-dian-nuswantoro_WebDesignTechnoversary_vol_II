@@ -363,7 +363,7 @@ const { hero, team, feedback } = aboutContent;
     padding: 8px 16px;
     border-radius: 9999px;
     border: 1px solid rgba(46, 37, 33, 0.22);
-    background-color: transparent;
+    background-color: #ffffff;
     color: var(--color-charcoal);
     font-family: var(--font-sans);
     font-size: 13.5px;
@@ -385,15 +385,20 @@ const { hero, team, feedback } = aboutContent;
   .fb-input,
   .fb-textarea {
     width: 100%;
-    border: 1px solid rgba(46, 37, 33, 0.2);
+    border: 1px solid rgba(46, 37, 33, 0.24);
     border-radius: var(--radius-xs);
-    background-color: var(--color-ash-canvas);
+    background-color: var(--color-neutral-1);
     color: var(--color-charcoal);
     font-family: var(--font-sans);
     font-size: 15px;
     padding: 12px 14px;
     box-sizing: border-box;
     transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .fb-input::placeholder,
+  .fb-textarea::placeholder {
+    color: rgba(46, 37, 33, 0.45);
   }
 
   .fb-input:focus,

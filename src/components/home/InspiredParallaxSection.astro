@@ -29,12 +29,13 @@ const { inspired } = homeContent;
       <div class="inspired-photo-frame parallax-window">
         <img
           src={inspired.image}
-          alt="Cahaya Matahari Menembus Hutan Hijau"
+          alt="Hutan Pinus Hijau"
           class="inspired-photo parallax-media"
-          data-parallax="0.22"
+          data-parallax="0.17"
           loading="lazy"
           decoding="async"
         />
+        <div class="inspired-photo-tint" aria-hidden="true"></div>
       </div>
     </div>
   </div>
@@ -140,6 +141,7 @@ const { inspired } = homeContent;
     width: 100%;
     height: clamp(460px, 68vh, 660px);
     border-radius: 16px;
+    border: 1px solid rgba(46, 37, 33, 0.1);
     overflow: hidden;
   }
 
@@ -151,6 +153,16 @@ const { inspired } = homeContent;
     position: absolute;
     top: -14%;
     left: 0;
+    filter: contrast(1.08) saturate(1.1) brightness(0.95) sepia(0.06);
+  }
+
+  .inspired-photo-tint {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 45%, transparent 54%, rgba(22, 30, 24, 0.24) 100%),
+      linear-gradient(180deg, rgba(22, 30, 24, 0.06) 0%, transparent 25%, rgba(22, 30, 24, 0.16) 100%);
   }
 
   /* Bottom Centered Paragraph */
