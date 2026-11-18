@@ -15,7 +15,7 @@ const { beforeAfter } = homeContent;
                 <span class="ba-hint font-mono">GESER KIRI & KANAN</span>
             </div>
 
-            <div class="ba-stage" id="ba-stage" data-reveal>
+            <div class="ba-stage" id="ba-stage">
                 <div class="ba-layer ba-layer--healthy">
                     <img
                         src={beforeAfter.healthy.image}
@@ -293,7 +293,6 @@ const { beforeAfter } = homeContent;
 
     .ba-layer--burned {
         clip-path: inset(0 50% 0 0);
-        will-change: clip-path;
         z-index: 2;
     }
 
