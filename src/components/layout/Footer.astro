@@ -98,18 +98,18 @@ import { siteContent } from "../../data/content";
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
   }
 
   .footer-big-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 26px;
+    font-size: 21px;
     font-weight: 500;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
-    padding: 6px 0;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    padding: 5px 0;
     color: var(--color-cream);
     transition: opacity 0.2s ease;
   }
@@ -144,7 +144,35 @@ import { siteContent } from "../../data/content";
   @media (max-width: 900px) {
     .footer-grid {
       grid-template-columns: 1fr;
-      gap: 36px;
+      gap: 32px;
+    }
+
+    .footer-big-link {
+      font-size: 19px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ashen-footer {
+      padding: 52px 0 28px;
+    }
+
+    .footer-grid {
+      gap: 28px;
+      padding-bottom: 36px;
+    }
+
+    .footer-col-label {
+      margin-bottom: 12px;
+    }
+
+    .footer-links {
+      gap: 2px;
+    }
+
+    .footer-big-link {
+      font-size: 16px;
+      padding: 5px 0;
     }
   }
 </style>
