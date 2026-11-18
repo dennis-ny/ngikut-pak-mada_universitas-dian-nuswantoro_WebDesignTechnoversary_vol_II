@@ -64,6 +64,7 @@ const slides = natureStory.slides;
 
 <script>
   const section = document.getElementById("nature-story");
+  const stickyEl = section?.querySelector<HTMLElement>(".nature-sticky") ?? null;
   const bgImg = document.getElementById("nature-bg-img");
   const dimOverlay = document.getElementById("nature-dim-overlay");
   const subcaptions = Array.from(document.querySelectorAll<HTMLElement>("[data-subcaption-idx]"));
@@ -122,6 +123,10 @@ const slides = natureStory.slides;
 
     const p = currentP;
     const e = smoothstep(currentEntry);
+
+    if (stickyEl) {
+      stickyEl.style.visibility = e > 0.001 || targetEntry > 0.001 ? "visible" : "hidden";
+    }
 
     if (bgImg) {
       const bgY = (1 - e) * 6 - p * 30;
