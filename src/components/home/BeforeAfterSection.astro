@@ -21,7 +21,6 @@ const { beforeAfter } = homeContent;
                         src={beforeAfter.healthy.image}
                         alt={beforeAfter.healthy.label}
                         class="ba-bg-img"
-                        loading="lazy"
                         decoding="async"
                     />
                     <div class="ba-shade"></div>
@@ -41,7 +40,6 @@ const { beforeAfter } = homeContent;
                         src={beforeAfter.burned.image}
                         alt={beforeAfter.burned.label}
                         class="ba-bg-img"
-                        loading="lazy"
                         decoding="async"
                     />
                     <div class="ba-shade"></div>
@@ -233,6 +231,7 @@ const { beforeAfter } = homeContent;
         border-top: 1px solid rgba(252, 246, 236, 0.08);
         border-bottom: 1px solid rgba(252, 246, 236, 0.1);
         color: var(--color-cream);
+        transform: translateZ(0);
     }
 
     .ba-sticky {
@@ -274,6 +273,7 @@ const { beforeAfter } = homeContent;
         border-radius: 16px;
         border: 1px solid rgba(252, 246, 236, 0.14);
         overflow: hidden;
+        contain: layout paint;
         user-select: none;
         touch-action: pan-y;
         cursor: ew-resize;
