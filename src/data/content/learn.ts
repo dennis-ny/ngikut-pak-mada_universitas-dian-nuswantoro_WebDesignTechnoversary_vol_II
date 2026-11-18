@@ -76,38 +76,45 @@ export const learnContent: LearnContent = {
     subtitle:
       "Tonton rekaman demonstrasi singkat (Screen Record & Voice Over) tentang bagaimana model gunung 3D kami memvisualisasikan hubungan antara kebakaran hutan, kabut asap, penebangan liar, banjir, tanah longsor, dan perilaku satwa liar.",
     videoUrl: "/videos/ashen-3d-intro.mp4",
-    posterUrl: "/images/hero-fire.avif",
-    duration: "03:15",
+    posterUrl: "/images/video-poster.jpg",
+    duration: "02:05",
     narratorNote:
       "Tip: Klik bab (chapter) di samping kanan untuk melompat ke penjelasan fitur tertentu pada video.",
     chapters: [
       {
         time: "00:00",
         seconds: 0,
-        title: "01. Pengenalan Topografi Gunung & 8 Klaster Desa",
+        title: "01. Intro: Pulau Gunung & Ekosistem Sehat",
         description:
-          "Memahami struktur 96 zona lereng gunung, 80 zona habitat satwa, dan 8 klaster pemukiman di hilir beserta indikator rumah tertinggi."
+          "Pengenalan pulau gunung hijau yang masih asri, udara bersih, satwa liar di dalam hutan, dan desa-desa di sekitarnya."
       },
       {
-        time: "00:45",
-        seconds: 45,
-        title: "02. Simulasi Api, Rembetan Karhutla & Kualitas Udara",
+        time: "00:21",
+        seconds: 21,
+        title: "02. Demo Kebakaran Hutan & Kabut Asap",
         description:
-          "Bagaimana titik api merembet ke zona tetangga, menghasilkan partikel asap pekat, mengubah warna langit, dan memperburuk kualitas udara."
+          "Simulasi api menyala dan merembet ke petak tetangga, asap menebal, kualitas udara memburuk, hingga satwa kehilangan habitat."
+      },
+      {
+        time: "00:56",
+        seconds: 56,
+        title: "03. Demo Hujan: Banjir & Tanah Longsor",
+        description:
+          "Saat hujan turun di lereng yang gundul dan hangus pasca kebakaran, tanah longsor terjadi dan luapan air merendam desa."
       },
       {
         time: "01:30",
         seconds: 90,
-        title: "03. Pembalakan Liar & AI Koridor Satwa (Monyet & Burung)",
+        title: "04. Tanam & Jaga Hutan (Reboisasi)",
         description:
-          "Melihat bagaimana 16 monyet dan 10 burung bereaksi saat pohon ditebang: mengungsi, menyeberangi lahan gundul, atau mati kelaparan saat terisolasi."
+          "Memulihkan lereng gundul dengan penanaman pohon kembali untuk menjaga tanah, satwa, dan keselamatan warga sekitar."
       },
       {
-        time: "02:20",
-        seconds: 140,
-        title: "04. Musim Hujan: Deformasi Tanah Longsor, Banjir & Reboisasi",
+        time: "01:53",
+        seconds: 113,
+        title: "05. Closing: Menjaga Bumi untuk Masa Depan",
         description:
-          "Saat hujan turun di lereng gundul/hangus, tanah mengalami erosi dan longsor, memicu banjir desa—serta bagaimana alat Tanam (Reboisasi) memulihkannya."
+          "Ajakan menjaga, melindungi, dan merawat hutan demi kehidupan yang lebih baik bagi generasi mendatang."
       }
     ]
   },
