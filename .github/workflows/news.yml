@@ -101,8 +101,8 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 15
     steps:
-      - name: Checkout repository terbaru
-        uses: actions/checkout@v4
-
-      - name: Rebuild container production dengan berita baru
-        run: docker compose -f compose.prod.yaml up -d --build --remove-orphans
+      - name: Pull dan rebuild container production dengan berita baru
+        run: |
+          cd "$HOME/apps/ngikut-pak-mada_universitas-dian-nuswantoro_WebDesignTechnoversary_vol_II"
+          git pull --ff-only origin main
+          docker compose -f compose.prod.yaml up -d --build --remove-orphans

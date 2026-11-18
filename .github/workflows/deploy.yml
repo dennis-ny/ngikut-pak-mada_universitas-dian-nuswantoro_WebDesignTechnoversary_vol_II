@@ -15,8 +15,8 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 15
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build and start production container
-        run: docker compose -f compose.prod.yaml up -d --build --remove-orphans
+      - name: Pull and rebuild production container in apps directory
+        run: |
+          cd "$HOME/apps/ngikut-pak-mada_universitas-dian-nuswantoro_WebDesignTechnoversary_vol_II"
+          git pull --ff-only origin main
+          docker compose -f compose.prod.yaml up -d --build --remove-orphans
