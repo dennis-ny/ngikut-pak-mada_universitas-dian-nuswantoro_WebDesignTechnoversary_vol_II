@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-18T02:01:38Z",
+  "generatedAt": "2026-11-19T04:11:18Z",
   "windowDays": {
     "karhutla": 7,
     "pembalakan": 90,
     "banjir": 7,
-    "satwa": 90
+    "satwa": 7
   },
   "counts": {
-    "Karhutla & Asap": 4,
+    "Karhutla & Asap": 7,
     "Pembalakan Liar": 2,
-    "Banjir & Longsor": 5,
+    "Banjir & Longsor": 8,
     "Satwa Terdampak": 4
   },
   "items": [
@@ -30,21 +30,6 @@
       "url": "https://mongabay.co.id/2026/11/14/tim-gabungan-tebang-sawit-di-suaka-margasatwa-lamandau/"
     },
     {
-      "id": "n-a88fa76482",
-      "title": "Orangutan Tapanuli dan Jembatan Arboreal yang Menyatukan Kembali Hutannya di Batang Toru",
-      "topic": "satwa",
-      "category": "Satwa Terdampak",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 3,
-      "source": "Mongabay Indonesia",
-      "publishedAt": "2026-09-20T01:23:05Z",
-      "location": "Sumatera Utara",
-      "summary": "Jalan raya dan pembukaan hutan memecah habitat orangutan menjadi bagian-bagian terisolasi. Kondisi ini memaksa satwa yang hidup di pepohonan turun ke tanah untuk berpindah, sehingga meningkatkan risiko tertabrak, diburu, atau berkonflik dengan manusia. Di Ekosistem Batang Toru, Sumatera Utara…",
-      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/01/18070127/Orangutan-tapanuli_Junaidi-Mongabay1-1536x1024-1-768x512.jpeg",
-      "url": "https://mongabay.co.id/short-article/2026/09/orangutan-tapanuli-dan-jembatan-arboreal-yang-menyatukan-kembali-hutannya-di-batang-toru/"
-    },
-    {
       "id": "n-b2bdf0b4c9",
       "title": "Mengapa Deforestasi Indonesia Terus Menggila?",
       "topic": "pembalakan",
@@ -60,6 +45,36 @@
       "url": "https://mongabay.co.id/2026/09/17/mengapa-deforestasi-indonesia-terus-menggila/"
     },
     {
+      "id": "n-ad81add9db",
+      "title": "Kebakaran Taman Nasional Way Kambas Ulah Pemburu Satwa Liar?",
+      "topic": "satwa",
+      "category": "Satwa Terdampak",
+      "topicSecondary": "karhutla",
+      "secondaryCategory": "Karhutla & Asap",
+      "ecoLink": 2,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-19T04:05:22Z",
+      "location": "Lampung",
+      "summary": "Kebakaran hutan dan lahan (karhutla) membara di hampir seluruh wilayah Indonesia, termasuk di Taman Nasional Way Kambas (TNWK), Lampung. Karhutla di Way Kambas ada dugaan ulah pemburu liar. Parjo, bukan nama sebenarnya, mantan pemburu yakin betul kejadian di kawasan konservasi dataran rendah di…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/11/15202917/medium_IMG_20260823_WA_0000_9b8aaa4fb8-750x512.jpg",
+      "url": "https://mongabay.co.id/2026/11/19/kebakaran-taman-nasional-way-kambas-ulah-pemburu-satwa-liar/"
+    },
+    {
+      "id": "n-eea70c6776",
+      "title": "Mengapa Perburuan Harimau Sumatera Sulit Dihentikan?",
+      "topic": "satwa",
+      "category": "Satwa Terdampak",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 2,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-18T10:00:48Z",
+      "location": null,
+      "summary": "Perburuan liar masih menjadi ancaman serius bagi harimau sumatera (Panthera tigris sumatrae) di Taman Nasional Gunung Leuser. Meski patroli hutan dan pemberantasan perdagangan satwa terus dilakukan, aktivitas perburuan belum menunjukkan penurunan yang berarti. Temuan tersebut diungkap dalam…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2024/03/22003924/Harimau-sumatera-768x512.jpeg",
+      "url": "https://mongabay.co.id/short-article/2026/11/mengapa-perburuan-harimau-sumatera-sulit-dihentikan/"
+    },
+    {
       "id": "n-afe1512d6b",
       "title": "Dana Karbon Tak Hentikan Deforestasi Kalimantan Timur",
       "topic": "pembalakan",
@@ -73,6 +88,21 @@
       "summary": "Duit karbon mengalir di Kalimantan Timur, tetapi tak mampu melindungi hutan provinsi itu. Deforestasi dan degradasi hutan terus terjadi di tengah guyuran uang Forest Carbon Partnership Facility–Carbon Fund (FCPF-CF). Data Yayasan Auriga Nusantara menunjukkan, sepanjang 10 tahun terakhir…",
       "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/10/22223136/Foto-13-768x512.jpeg",
       "url": "https://mongabay.co.id/2026/10/28/dana-karbon-tak-hentikan-deforestasi-kalimantan-timur/"
+    },
+    {
+      "id": "n-57a7b71fd5",
+      "title": "Nasib Satwa Liar Terdampak Kebakaran Hutan",
+      "topic": "karhutla",
+      "category": "Karhutla & Asap",
+      "topicSecondary": "satwa",
+      "secondaryCategory": "Satwa Terdampak",
+      "ecoLink": 1,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-18T01:59:16Z",
+      "location": null,
+      "summary": "Napas Jack terlihat begitu berat. Sesekali, orangutan berusia satu tahun itu bersin-bersin disertai lendir yang keluar dari hidung. Hasil foto sinar X yang dokter lakukan mendapati paru-paru kera besar itu kotor. “Agustus–September, asap cukup pekat dan karhutla (kebakaran hutan dan lahan) hampir…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/09/19111810/2-768x512.jpg",
+      "url": "https://mongabay.co.id/2026/11/18/nasib-satwa-liar-terdampak-kebakaran-hutan/"
     },
     {
       "id": "n-246b68824b",
@@ -105,19 +135,109 @@
       "url": "https://mongabay.co.id/2026/11/16/masyarakat-sipil-lintas-negara-desak-antisipasi-bencana-asap/"
     },
     {
-      "id": "n-e81ecfa5e1",
-      "title": "Sedih, Masa Depan Kuskus Papua Terancam Akibat Kepungan Deforestasi",
+      "id": "n-7d257f37b4",
+      "title": "Wanita yang Terseret Banjir di Curug Cikuwulung Bogor Ditemukan Tewas",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-19T02:50:52Z",
+      "location": null,
+      "summary": "Pencarian Nurhusna Luvita (19) yang hilang di Curug Cikuluwung berakhir tragis. Ia ditemukan tak bernyawa setelah terseret arus banjir bandang.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/19/wanita-asal-tangerang-yang-terseret-banjir-di-curug-cikuluwung-bogor-ditemukan-tewas-1795056616900_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8759554/wanita-yang-terseret-banjir-di-curug-cikuwulung-bogor-ditemukan-tewas"
+    },
+    {
+      "id": "n-05df9028b4",
+      "title": "Evakuasi Bangkai Heli Karhutla di Kalteng Tuntas Usai Batang Ekor Diangkat",
+      "topic": "karhutla",
+      "category": "Karhutla & Asap",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-19T02:40:53Z",
+      "location": "Kalimantan Tengah",
+      "summary": "Petugas berhasil mengangkat batang ekor helikopter Mi-17V5 yang jatuh saat operasi pemadaman karhutla di perairan Desa Sungai Perlu, Seruyan, Kalimantan Tengah.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/19/evakuasi-bangkai-helikopter-mi-17-di-seruyan-1795053945759_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8759539/evakuasi-bangkai-heli-karhutla-di-kalteng-tuntas-usai-batang-ekor-diangkat"
+    },
+    {
+      "id": "n-5738f98182",
+      "title": "Wanita Hilang Terseret Banjir Bandang saat Liburan di Curug Cikuluwung Bogor",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-18T19:19:03Z",
+      "location": null,
+      "summary": "Seorang wanita 19 tahun, Nurhusna Luvita, hilang terbawa arus di Curug Cikuluwung, Bogor. Tim SAR sedang melakukan pencarian setelah hujan deras.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2023/04/14/simulasi-penanganan-kecelakaan-di-sungai-luworo-yang-dilakukan-usai-peresmian-jembatan-luworo-pilang-kenceng-kabupaten-madiun-_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8759361/wanita-hilang-terseret-banjir-bandang-saat-liburan-di-curug-cikuluwung-bogor"
+    },
+    {
+      "id": "n-988166d054",
+      "title": "Longsor Terjang Persawahan di Bogor, Ribuan Ikan di Tambak Mati Terendam Lumpur",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-18T17:30:11Z",
+      "location": null,
+      "summary": "Hujan deras di Desa Purasari, Bogor, menyebabkan longsor yang merusak tambak ikan warga, mengakibatkan ribuan ikan mati.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/19/hujan-deras-di-desa-purasari-bogor-menyebabkan-longsor-dokistimewa-1795022947751_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8759346/longsor-terjang-persawahan-di-bogor-ribuan-ikan-di-tambak-mati-terendam-lumpur"
+    },
+    {
+      "id": "n-be4828fc4a",
+      "title": "Dari Tanah Pasundan ke Ujung Kulon: Perjalanan Badak Jawa",
       "topic": "satwa",
       "category": "Satwa Terdampak",
-      "topicSecondary": "pembalakan",
-      "secondaryCategory": "Pembalakan Liar",
-      "ecoLink": 1,
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
       "source": "Mongabay Indonesia",
-      "publishedAt": "2026-08-25T10:03:36Z",
-      "location": "Papua",
-      "summary": "Video seekor kuskus yang bertahan di antara pepohonan tumbang di Merauke, Papua Selatan, ramai dibagikan di media sosial pada awal Agustus 2026. Dalam rekaman tersebut, satwa berwarna keemasan dengan totol putih terlihat memanjat sisa dahan, sementara alat berat terus membuka kawasan di…",
-      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/08/18022306/Kuskus-totol-768x512.jpeg",
-      "url": "https://mongabay.co.id/short-article/2026/08/sedih-masa-depan-kuskus-papua-terancam-akibat-kepungan-deforestasi/"
+      "publishedAt": "2026-11-18T05:46:44Z",
+      "location": null,
+      "summary": "Jauh sebelum seluruh populasinya terisolasi di semenanjung paling barat Pulau Jawa, Rhinoceros sondaicus pernah menjelajahi rimba dataran tinggi hingga pesisir Tanah Pasundan. Berbekal penelusuran arsip kolonial, catatan perburuan masa lampau, dan data ekologi terkini, perjalanan panjang salah…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2017/09/22083414/Badak-jawa1-768x512.jpg",
+      "url": "https://mongabay.co.id/specials/2026/11/dari-tanah-pasundan-ke-ujung-kulon-perjalanan-badak-jawa/"
+    },
+    {
+      "id": "n-d90d76fc4a",
+      "title": "CT ARSA, YRKB dan Koarmada Kirim 5 ton Bantuan untuk Penyintas Karhutla",
+      "topic": "karhutla",
+      "category": "Karhutla & Asap",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "CNN Indonesia",
+      "publishedAt": "2026-11-18T04:31:12Z",
+      "location": null,
+      "summary": "CT ARSA Foundation, YRKB, dan Koarmada RI mengirim 5 ton bantuan untuk penyintas karhutla di Kalimantan, termasuk kebutuhan pokok dan perlengkapan sehari-hari.",
+      "image": "https://akcdn.detik.net.id/visual/2026/11/18/ct-arsa-foundation-peduli-kemanusian-bencana-karhutla-kalimantan-1794975029976_169.jpeg?w=720&q=90",
+      "url": "https://www.cnnindonesia.com/nasional/20261118112651-20-1428443/ct-arsa-yrkb-koarmada-kirim-5-ton-bantuan-untuk-penyintas-karhutla"
+    },
+    {
+      "id": "n-44dc23c0f3",
+      "title": "Penembakan di Sindangkerta 1934, Jejak Terakhir Badak Jawa dari Priangan",
+      "topic": "satwa",
+      "category": "Satwa Terdampak",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-18T02:08:14Z",
+      "location": null,
+      "summary": "Museum sejarah alam menyimpan lebih dari sekadar benda pajangan. Spesimen yang dikumpulkan hampir seabad lalu merekam ukuran tubuh dan ciri morfologi satwa dari masa ketika populasinya masih tersebar luas, sehingga menjadi pembanding bagi peneliti masa kini. Sering kali ada cerita perburuan di…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2018/04/22075335/Samson_TNUK-768x512.jpg",
+      "url": "https://mongabay.co.id/2026/11/18/penembakan-di-sindangkerta-1934-jejak-terakhir-badak-jawa-dari-priangan/"
     },
     {
       "id": "n-d227fe0bf7",
@@ -208,36 +328,6 @@
       "summary": "Hujan deras menyebabkan longsor yang menutup akses jalan penghubung Dusun Simeluk. Berkat sinergi warga dan Polsek, jalan kini kembali bisa dilintasi.",
       "image": "https://akcdn.detik.net.id/visual/2026/01/24/ilustrasi-tanah-longsor-1769227133657_169.jpeg?w=720&q=90",
       "url": "https://www.cnnindonesia.com/nasional/20261116224748-20-1427891/longsor-sempat-tutup-jalan-provinsi-di-simalungun-akibat-hujan-deras"
-    },
-    {
-      "id": "n-6e3df772b9",
-      "title": "Kisah Sedih Novita dan Penderitaan Puluhan Orangutan Kalimantan Akibat Hutannya Terbakar",
-      "topic": "satwa",
-      "category": "Satwa Terdampak",
-      "topicSecondary": "karhutla",
-      "secondaryCategory": "Karhutla & Asap",
-      "ecoLink": 0,
-      "source": "Mongabay Indonesia",
-      "publishedAt": "2026-10-18T03:51:31Z",
-      "location": "Kalimantan Tengah",
-      "summary": "Novita adalah nama yang disematkan untuk orangutan kalimantan (Pongo pygmaeus) betina usia sekitar 5 tahun. Dia ditemukan bertahan di atas pohon sengon di kawasan Katune, Banturung, Kecamatan Bukit Batu, Palangka Raya, Kalimantan Tengah, pada 25 September 2026. Kawasan tempatnya mencari makan dan…",
-      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/10/18034505/Orangutan-Novita1-768x512.jpeg",
-      "url": "https://mongabay.co.id/2026/10/18/kisah-sedih-novita-dan-penderitaan-puluhan-orangutan-kalimantan-akibat-hutannya-terbakar/"
-    },
-    {
-      "id": "n-42a478ad2c",
-      "title": "Kasus 5 Bayi Orangutan di India, Waspadai Perdagangan Satwa Liar Melalui Jalur Laut Aceh",
-      "topic": "satwa",
-      "category": "Satwa Terdampak",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "Mongabay Indonesia",
-      "publishedAt": "2026-09-14T06:44:55Z",
-      "location": "Aceh",
-      "summary": "Kasus lima bayi orangutan yang ditemukan di India, Selasa (8/9/26), menguatkan dugaan adanya perdagangan ilegal satwa liar lintas negara. Dwi Nugroho Adhiasto, pakar perdagangan satwa liar yang merupakan Senior Advisor Scents, mengatakan berdasarkan pengamatan visual awal sejumlah pakar dan…",
-      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/09/14063734/Bayi-Orangutan-Sumatera-di-SRA-1-768x512.jpg",
-      "url": "https://mongabay.co.id/2026/09/14/kasus-5-bayi-orangutan-di-india-waspadai-perdagangan-satwa-liar-melalui-jalur-laut-aceh/"
     }
   ]
 }
