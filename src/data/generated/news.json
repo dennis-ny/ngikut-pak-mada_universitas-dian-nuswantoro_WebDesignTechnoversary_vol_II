@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-19T04:11:18Z",
+  "generatedAt": "2026-11-20T03:58:53Z",
   "windowDays": {
     "karhutla": 7,
     "pembalakan": 90,
@@ -8,10 +8,10 @@
     "satwa": 7
   },
   "counts": {
-    "Karhutla & Asap": 7,
+    "Karhutla & Asap": 9,
     "Pembalakan Liar": 2,
-    "Banjir & Longsor": 8,
-    "Satwa Terdampak": 4
+    "Banjir & Longsor": 11,
+    "Satwa Terdampak": 6
   },
   "items": [
     {
@@ -30,6 +30,21 @@
       "url": "https://mongabay.co.id/2026/11/14/tim-gabungan-tebang-sawit-di-suaka-margasatwa-lamandau/"
     },
     {
+      "id": "n-dd822de543",
+      "title": "Orang Utan Kurus Diduga gegara Karhutla Kalteng Kini Dilepas Lagi ke Hutan",
+      "topic": "satwa",
+      "category": "Satwa Terdampak",
+      "topicSecondary": "karhutla",
+      "secondaryCategory": "Karhutla & Asap",
+      "ecoLink": 3,
+      "source": "Detik",
+      "publishedAt": "2026-11-20T03:23:42Z",
+      "location": "Kalimantan Tengah",
+      "summary": "Orangutan Harie kembali ke habitat alaminya di Suaka Margasatwa Lamandau setelah dinyatakan sehat. Pelepasliaran dilakukan untuk menjaga insting liarnya.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/18/orang-utan-harie-saat-dievakuasi-1794966589331_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8761345/orang-utan-kurus-diduga-gegara-karhutla-kalteng-kini-dilepas-lagi-ke-hutan"
+    },
+    {
       "id": "n-b2bdf0b4c9",
       "title": "Mengapa Deforestasi Indonesia Terus Menggila?",
       "topic": "pembalakan",
@@ -43,6 +58,36 @@
       "summary": "Hutan alam di Indonesia makin terpuruk. Laporan Forest Watch Indonesia (FWI), hingga 2025, luas hutan alam Indonesia kini tersisa 88,43 juta hektar atau sekitar 47% dari total daratan. Ia menyusut 1,06 juta hektar dibanding tahun 2024. Kalimantan dan Sumatera merupakan region dengan hutan alam…",
       "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2024/04/22003704/Gambar-udara-yang-menunjukkan-deforestasi-hutan-alam-yang-signifikan-di-dalam-konsesi-kayu-pulp-PT-Mayawana-Persada-Agustus-2023-Sumber-Greenpeace-Indonesia-768x453.png",
       "url": "https://mongabay.co.id/2026/09/17/mengapa-deforestasi-indonesia-terus-menggila/"
+    },
+    {
+      "id": "n-457fe8bb20",
+      "title": "Menagih Keseriusan Pemerintah Tindak Karhutla di Konsesi Perusahaan [1]",
+      "topic": "karhutla",
+      "category": "Karhutla & Asap",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 2,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-20T01:00:38Z",
+      "location": null,
+      "summary": "Kebakaran hutan dan lahan (karhutla) yang berlangsung berbulan-bulan merugikan, masyarakat, ekologi, hingga negara tetangga, Malaysia dan Singapura. Meski Presiden Prabowo Subianto sempat meminta maaf di Konferensi Tingkat Tinggi (KTT) ke-49 ASEAN di Manila, ucapan normatifnya akan semakin hambar…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2023/09/22011042/Karhutla-riyad-768x512.jpg",
+      "url": "https://mongabay.co.id/2026/11/20/menagih-keseriusan-pemerintah-tindak-karhutla-di-konsesi-perusahaan-1/"
+    },
+    {
+      "id": "n-436806cb14",
+      "title": "Menteri LH Minta Perairan Ujung Kulon Dikeluarkan dari Wilayah Tambang",
+      "topic": "satwa",
+      "category": "Satwa Terdampak",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 2,
+      "source": "CNN Indonesia",
+      "publishedAt": "2026-11-19T07:43:02Z",
+      "location": null,
+      "summary": "Menteri LH Jumhur Hidayat meminta wilayah perairan Taman Nasional Ujung Kulon dikeluarkan dari Wilayah Usaha Pertambangan untuk melindungi Badak Jawa.",
+      "image": "https://akcdn.detik.net.id/visual/2026/11/19/menteri-lh-jumhur-hidayat-minta-perairan-taman-nasional-ujung-kulon-dikeluarkan-dari-wilayah-usaha-tambang-1795073920353_169.jpeg?w=720&q=90",
+      "url": "https://www.cnnindonesia.com/nasional/20261119141417-32-1429016/menteri-lh-minta-perairan-ujung-kulon-dikeluarkan-dari-wilayah-tambang"
     },
     {
       "id": "n-ad81add9db",
@@ -133,6 +178,81 @@
       "summary": "Selama hampir tiga bulan, sejak 4 Agustus hingga 31 Oktober 2026, jutaan orang di Asia Tenggara harus menghirup udara yang tercemar asap kebakaran hutan dan lahan (karhutla) dari Indonesia. Jerebu menyelimuti Indonesia, Singapura, dan Malaysia. Asap bahkan menyeberangi perbatasan hingga Port…",
       "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/11/16223018/Beberapa-orang-melintasi-jalanan-yang-tertutup-kabut-asap-tebal-di-Kabupaten-Banyuasin-Sumatera-Selatan-768x512.webp",
       "url": "https://mongabay.co.id/2026/11/16/masyarakat-sipil-lintas-negara-desak-antisipasi-bencana-asap/"
+    },
+    {
+      "id": "n-542c653e47",
+      "title": "Banjir Bandang di Lebak Banten, 2 Warga Baduy Hanyut Terseret Arus",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "CNN Indonesia",
+      "publishedAt": "2026-11-20T02:40:42Z",
+      "location": "Banten",
+      "summary": "Banjir bandang di Sungai Cisimeut, Lebak, Banten, menyebabkan dua warga Baduy hanyut. Satu ditemukan meninggal, pencarian korban lain masih berlangsung.",
+      "image": "https://akcdn.detik.net.id/visual/2023/05/30/ilustrasi-kapal-tenggelam-3_169.jpeg?w=720&q=90",
+      "url": "https://www.cnnindonesia.com/nasional/20261120083246-20-1429268/banjir-bandang-di-lebak-banten-2-warga-baduy-hanyut-terseret-arus"
+    },
+    {
+      "id": "n-2c61b73c3c",
+      "title": "Banjir Kembali Landa Aceh, Komisi V DPR Desak Percepat Penanganan",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-20T00:46:29Z",
+      "location": "Aceh",
+      "summary": "Ketua Komisi V DPR RI Lasarus mendesak pemerintah percepat penanganan bencana banjir di Aceh. Ia menyoroti anggaran dan pentingnya informasi cuaca dari BMKG.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2025/12/09/ketua-komisi-v-dpr-lasarus-1765266581232_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8761146/banjir-kembali-landa-aceh-komisi-v-dpr-desak-percepat-penanganan"
+    },
+    {
+      "id": "n-0ba11e7f8e",
+      "title": "Komisi VIII DPR Panggil Kepala BNPB Pekan Depan, Bahas Banjir Aceh-Sumatera",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-20T00:18:05Z",
+      "location": "Aceh",
+      "summary": "Komisi VIII DPR akan memanggil Kepala BNPB Letjen TNI Kristomei Sianturi, pekan depan, untuk membahas penanganan banjir, khususnya di Aceh dan Sumatera.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/03/06/marwan-dasopang-1772781655015_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8761134/komisi-viii-dpr-panggil-kepala-bnpb-pekan-depan-bahas-banjir-aceh-sumatera"
+    },
+    {
+      "id": "n-f09f42bf93",
+      "title": "2 Orang Hanyut Terseret Banjir Bandang Cisimeut Ternyata Warga Baduy",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-19T17:48:00Z",
+      "location": null,
+      "summary": "Pulung (21) dan Aliyah (10) hilang terseret arus di Sungai Cisimeut, Lebak. Tim SAR gabungan dikerahkan untuk mencari kedua warga Baduy tersebut.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/20/proses-pencarian-warga-baduy-yang-hilang-saat-banjir-di-sungai-cisimeut-lebak-1795110432661_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8761084/2-orang-hanyut-terseret-banjir-bandang-cisimeut-ternyata-warga-baduy"
+    },
+    {
+      "id": "n-c520924da5",
+      "title": "BRAN Dorong Reforma Agraria Solusi Cegah Karhutla Berulang",
+      "topic": "karhutla",
+      "category": "Karhutla & Asap",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-19T16:43:15Z",
+      "location": null,
+      "summary": "Kepala BRAN Dedi Prasetyo menekankan pentingnya evaluasi tata kelola agraria untuk mencegah karhutla. Perlindungan hak masyarakat adat jadi fokus utama.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/19/kepala-badan-reforma-agraria-nasional-bran-dedi-prasetyo-1795106566684_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8761040/bran-dorong-reforma-agraria-solusi-cegah-karhutla-berulang"
     },
     {
       "id": "n-7d257f37b4",
@@ -253,21 +373,6 @@
       "summary": "Walhi Kalbar laporkan 11 perusahaan ke Polda terkait dugaan karhutla. Apa saja perusahaan-perusahaan yang dilaporkan?",
       "image": "https://akcdn.detik.net.id/visual/2026/01/25/bandara-internasional-supadio-kalbar-di-kepung-karhutla-1769308318977_169.jpeg?w=720&q=90",
       "url": "https://www.cnnindonesia.com/nasional/20261117203557-12-1428296/walhi-laporkan-11-perusahaan-terkait-karhutla-kalbar-ke-polda"
-    },
-    {
-      "id": "n-5d18939f99",
-      "title": "Banjir Landa 4 Desa di Aceh Selatan, 947 Jiwa Terdampak",
-      "topic": "banjir",
-      "category": "Banjir & Longsor",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "Detik",
-      "publishedAt": "2026-11-17T16:19:39Z",
-      "location": "Aceh",
-      "summary": "Banjir melanda 4 desa di Aceh Selatan, dampak 947 jiwa. BPBD evakuasi warga ke posko pengungsian. Ketinggian air mencapai 140 cm.",
-      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/17/personel-bpbd-mengevakuasi-warga-terdampak-bencana-banjir-di-aceh-selatan-selasa-17112026-antaraho-humas-bpbd-aceh-selatan-1794932359171_169.jpeg?w=720&q=90",
-      "url": "https://news.detik.com/berita/d-8757651/banjir-landa-4-desa-di-aceh-selatan-947-jiwa-terdampak"
     },
     {
       "id": "n-5b602eaab8",
