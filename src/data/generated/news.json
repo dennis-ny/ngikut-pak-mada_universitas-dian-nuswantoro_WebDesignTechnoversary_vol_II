@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-20T03:58:53Z",
+  "generatedAt": "2026-11-21T03:59:46Z",
   "windowDays": {
     "karhutla": 7,
     "pembalakan": 90,
@@ -8,10 +8,10 @@
     "satwa": 7
   },
   "counts": {
-    "Karhutla & Asap": 9,
+    "Karhutla & Asap": 10,
     "Pembalakan Liar": 2,
     "Banjir & Longsor": 11,
-    "Satwa Terdampak": 6
+    "Satwa Terdampak": 7
   },
   "items": [
     {
@@ -58,6 +58,21 @@
       "summary": "Hutan alam di Indonesia makin terpuruk. Laporan Forest Watch Indonesia (FWI), hingga 2025, luas hutan alam Indonesia kini tersisa 88,43 juta hektar atau sekitar 47% dari total daratan. Ia menyusut 1,06 juta hektar dibanding tahun 2024. Kalimantan dan Sumatera merupakan region dengan hutan alam…",
       "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2024/04/22003704/Gambar-udara-yang-menunjukkan-deforestasi-hutan-alam-yang-signifikan-di-dalam-konsesi-kayu-pulp-PT-Mayawana-Persada-Agustus-2023-Sumber-Greenpeace-Indonesia-768x453.png",
       "url": "https://mongabay.co.id/2026/09/17/mengapa-deforestasi-indonesia-terus-menggila/"
+    },
+    {
+      "id": "n-458c2a44d4",
+      "title": "Menakar Penegakan Hukum Kasus Karhutla Perusahaan [2]",
+      "topic": "karhutla",
+      "category": "Karhutla & Asap",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 2,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-20T23:50:11Z",
+      "location": null,
+      "summary": "Desakan penegakan hukum bagi perusahaan dengan konsesi terjadi kebakaran terus menguat, Pemerintah termasuk aparat penegak hukum (APH) mulai menindak sejumlah perusahaan maupun perseorangan terduga pelaku serta penyebab kebakaran hutan dan lahan (karhutla). Data Map Nusantara, karhutla mencapai…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/11/02060740/3-Kebakaran-hutan-di-Desa-Lede-Kecamatan-Lede-meluas-ke-areal-perkebunan-warga-telaga-biru.-Meski-upaya-pemadaman-dilakuman-warga-api-tetap-meluas-dan-membakar-habis-tanaman-milik-warga-768x512.jpeg",
+      "url": "https://mongabay.co.id/2026/11/20/menakar-penegakan-hukum-kasus-karhutla-perusahaan-2/"
     },
     {
       "id": "n-457fe8bb20",
@@ -178,6 +193,21 @@
       "summary": "Selama hampir tiga bulan, sejak 4 Agustus hingga 31 Oktober 2026, jutaan orang di Asia Tenggara harus menghirup udara yang tercemar asap kebakaran hutan dan lahan (karhutla) dari Indonesia. Jerebu menyelimuti Indonesia, Singapura, dan Malaysia. Asap bahkan menyeberangi perbatasan hingga Port…",
       "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/11/16223018/Beberapa-orang-melintasi-jalanan-yang-tertutup-kabut-asap-tebal-di-Kabupaten-Banyuasin-Sumatera-Selatan-768x512.webp",
       "url": "https://mongabay.co.id/2026/11/16/masyarakat-sipil-lintas-negara-desak-antisipasi-bencana-asap/"
+    },
+    {
+      "id": "n-515e780efa",
+      "title": "Lima Spesies Badak di Dunia, Mengapa Nasibnya Berbeda?",
+      "topic": "satwa",
+      "category": "Satwa Terdampak",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-21T03:00:21Z",
+      "location": null,
+      "summary": "Perburuan liar masih menjadi ancaman serius bagi kelangsungan hidup badak di dunia. Meski berbagai upaya konservasi telah dilakukan, tiga dari lima spesies badak masih mengalami penurunan populasi. Laporan TRAFFIC dan International Union for Conservation of Nature (IUCN) pada tahun 2025…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2021/02/22041450/Javan-Rhino-JRE_David-768x512.jpg",
+      "url": "https://mongabay.co.id/short-article/2026/11/lima-spesies-badak-di-dunia-mengapa-nasibnya-berbeda/"
     },
     {
       "id": "n-542c653e47",
