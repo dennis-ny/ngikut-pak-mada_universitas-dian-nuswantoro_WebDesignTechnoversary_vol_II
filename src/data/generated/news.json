@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-21T03:59:46Z",
+  "generatedAt": "2026-11-22T03:09:35Z",
   "windowDays": {
     "karhutla": 7,
     "pembalakan": 90,
@@ -8,27 +8,12 @@
     "satwa": 7
   },
   "counts": {
-    "Karhutla & Asap": 10,
+    "Karhutla & Asap": 9,
     "Pembalakan Liar": 2,
-    "Banjir & Longsor": 11,
+    "Banjir & Longsor": 12,
     "Satwa Terdampak": 7
   },
   "items": [
-    {
-      "id": "n-41eb321057",
-      "title": "Tim Gabungan Tebang Sawit di Suaka Margasatwa Lamandau",
-      "topic": "karhutla",
-      "category": "Karhutla & Asap",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 4,
-      "source": "Mongabay Indonesia",
-      "publishedAt": "2026-11-14T23:31:20Z",
-      "location": "Kalimantan Tengah",
-      "summary": "Tim gabungan menebang sekitar 11.180 tanaman sawit seluas 99 hektar di kawasan Suaka Margasatwa Lamandau, Kabupaten Sukamara, Kalimantan Tengah, 8 November lalu. Penebangan tanaman sawit itu tindak lanjut penanganan perkara kebakaran hutan di SM Lamandau. Dalam kasus kebakaran hutan dan lahan…",
-      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/11/14232433/sawit-kresmes-3-768x512.jpg",
-      "url": "https://mongabay.co.id/2026/11/14/tim-gabungan-tebang-sawit-di-suaka-margasatwa-lamandau/"
-    },
     {
       "id": "n-dd822de543",
       "title": "Orang Utan Kurus Diduga gegara Karhutla Kalteng Kini Dilepas Lagi ke Hutan",
@@ -193,6 +178,51 @@
       "summary": "Selama hampir tiga bulan, sejak 4 Agustus hingga 31 Oktober 2026, jutaan orang di Asia Tenggara harus menghirup udara yang tercemar asap kebakaran hutan dan lahan (karhutla) dari Indonesia. Jerebu menyelimuti Indonesia, Singapura, dan Malaysia. Asap bahkan menyeberangi perbatasan hingga Port…",
       "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/11/16223018/Beberapa-orang-melintasi-jalanan-yang-tertutup-kabut-asap-tebal-di-Kabupaten-Banyuasin-Sumatera-Selatan-768x512.webp",
       "url": "https://mongabay.co.id/2026/11/16/masyarakat-sipil-lintas-negara-desak-antisipasi-bencana-asap/"
+    },
+    {
+      "id": "n-a2595210dc",
+      "title": "Nelangsa TK di Jaksel Langganan Banjir Meski Tak Hujan Besar",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-21T23:47:16Z",
+      "location": "DKI Jakarta",
+      "summary": "Sebuah TK di Petukangan Utara, Jakarta Selatan, kerap dilanda banjir meski hujan tidak turun deras. Apa penyebabnya?",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/21/wilayah-petukangan-utara-pesanggrahan-jakarta-selatan-jaksel-dilanda-banjir-sejak-kemarin-salah-satu-yang-terdampak-ialah-bang-1795245687539_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8763982/nelangsa-tk-di-jaksel-langganan-banjir-meski-tak-hujan-besar"
+    },
+    {
+      "id": "n-bbfcd9b462",
+      "title": "Longsor Susulan di Pejaten Timur Jaksel, Akses Jalan Terputus",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "CNN Indonesia",
+      "publishedAt": "2026-11-21T13:45:07Z",
+      "location": "DKI Jakarta",
+      "summary": "Longsor susulan di Jalan Langgar II, Pejaten Timur, Jakarta Selatan, akibat hujan deras, menyebabkan banjir di dua RT dengan ketinggian air hingga 50 cm.",
+      "image": "https://akcdn.detik.net.id/visual/2026/11/11/hujan-deras-tanah-longsor-landa-jakarta-1794381067069_169.jpeg?w=720&q=90",
+      "url": "https://www.cnnindonesia.com/nasional/20261121203400-20-1429934/longsor-susulan-di-pejaten-timur-jaksel-akses-jalan-terputus"
+    },
+    {
+      "id": "n-18a989a9aa",
+      "title": "Dua Daerah di Riau Tetapkan Status Siaga Bencana Banjir-Longsor",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "CNN Indonesia",
+      "publishedAt": "2026-11-21T06:52:47Z",
+      "location": "Riau",
+      "summary": "Kabupaten Rokan Hilir dan Kota Dumai, Riau, menetapkan status siaga bencana hidrometeorologi akibat banjir dan tanah longsor. BPBD Riau akan koordinasi bantuan.",
+      "image": "https://akcdn.detik.net.id/visual/2025/01/20/jalan-lintas-sumatera-lumpuh-akibat-banjir-di-jambi-7_169.jpeg?w=720&q=90",
+      "url": "https://www.cnnindonesia.com/nasional/20261121122412-20-1429797/dua-daerah-di-riau-tetapkan-status-siaga-bencana-banjir-longsor"
     },
     {
       "id": "n-515e780efa",
@@ -433,36 +463,6 @@
       "summary": "Satu warga dilaporkan meninggal dunia akibat bencana tanah longsor yang terjadi di Desa Limpakuwus, Kabupaten Banyumas, Jawa Tengah.",
       "image": "https://akcdn.detik.net.id/visual/2026/01/24/ilustrasi-tanah-longsor-1769227455227_169.jpeg?w=720&q=90",
       "url": "https://www.cnnindonesia.com/nasional/20261117134617-20-1428094/banjir-longsor-di-banyumas-1-tewas-13-pelajar-sempat-terjebak"
-    },
-    {
-      "id": "n-5c5238cc43",
-      "title": "5 Kecamatan Berstatus Awas Hujan, Warga Diminta Waspada Banjir Longsor",
-      "topic": "banjir",
-      "category": "Banjir & Longsor",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "CNN Indonesia",
-      "publishedAt": "2026-11-17T02:47:53Z",
-      "location": null,
-      "summary": "BNPB mengingatkan lima kecamatan di tiga provinsi berstatus Awas akibat potensi hujan. Masyarakat diminta waspada terhadap banjir dan longsor.",
-      "image": "https://akcdn.detik.net.id/visual/2022/02/18/ilustrasi-cuaca-buruk-5_169.jpeg?w=720&q=90",
-      "url": "https://www.cnnindonesia.com/nasional/20261117092720-20-1427991/5-kecamatan-berstatus-awas-hujan-warga-diminta-waspada-banjir-longsor"
-    },
-    {
-      "id": "n-42a4262d0b",
-      "title": "Longsor Sempat Tutup Jalan Provinsi di Simalungun Akibat Hujan Deras",
-      "topic": "banjir",
-      "category": "Banjir & Longsor",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "CNN Indonesia",
-      "publishedAt": "2026-11-16T17:07:48Z",
-      "location": null,
-      "summary": "Hujan deras menyebabkan longsor yang menutup akses jalan penghubung Dusun Simeluk. Berkat sinergi warga dan Polsek, jalan kini kembali bisa dilintasi.",
-      "image": "https://akcdn.detik.net.id/visual/2026/01/24/ilustrasi-tanah-longsor-1769227133657_169.jpeg?w=720&q=90",
-      "url": "https://www.cnnindonesia.com/nasional/20261116224748-20-1427891/longsor-sempat-tutup-jalan-provinsi-di-simalungun-akibat-hujan-deras"
     }
   ]
 }
