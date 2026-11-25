@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T06:59:06Z",
+  "generatedAt": "2026-11-25T05:26:43Z",
   "windowDays": {
     "karhutla": 7,
     "pembalakan": 90,
@@ -8,7 +8,7 @@
     "satwa": 7
   },
   "counts": {
-    "Karhutla & Asap": 11,
+    "Karhutla & Asap": 9,
     "Pembalakan Liar": 2,
     "Banjir & Longsor": 12,
     "Satwa Terdampak": 8
@@ -165,6 +165,51 @@
       "url": "https://mongabay.co.id/2026/10/28/dana-karbon-tak-hentikan-deforestasi-kalimantan-timur/"
     },
     {
+      "id": "n-9385534ff5",
+      "title": "Imbas Karhutla, 72 Orang Utan di Kalbar Dievakuasi dan 3 Kerangka Ditemukan",
+      "topic": "karhutla",
+      "category": "Karhutla & Asap",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 1,
+      "source": "Detik",
+      "publishedAt": "2026-11-25T04:46:36Z",
+      "location": "Kalimantan Barat",
+      "summary": "Sebanyak 72 orang utan dievakuasi dari Kalbar akibat kebakaran hutan. Tim BKSDA dan YIARI menyelamatkan Mama Raty dan anaknya, Raty, di Ketapang.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/23/penyelamatan-rajiv-orang-utan-mengkhawatirkan-di-bekas-karhutla-ketapang-1795416954074_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8768949/imbas-karhutla-72-orang-utan-di-kalbar-dievakuasi-dan-3-kerangka-ditemukan"
+    },
+    {
+      "id": "n-5505fd316e",
+      "title": "Tambang Emas Ilegal di Bogor Terendam Banjir, Puluhan Orang Diduga Terjebak",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 1,
+      "source": "Detik",
+      "publishedAt": "2026-11-25T02:56:36Z",
+      "location": null,
+      "summary": "Banjir merendam tambang emas ilegal di Bogor, puluhan orang terjebak dalam lubang 100 meter. Upaya pencarian masih berlangsung oleh tim SAR.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2023/07/27/melihat-tambang-emas-tradisional-ilegal-di-banyumas-yang-dipasang-garis-polisi-2_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8768764/tambang-emas-ilegal-di-bogor-terendam-banjir-puluhan-orang-diduga-terjebak"
+    },
+    {
+      "id": "n-1a1ff2826d",
+      "title": "Ada Tambang di Balik Wacana Badak Jawa Ujung Kulon ke Alas Purwo?",
+      "topic": "satwa",
+      "category": "Satwa Terdampak",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 1,
+      "source": "Mongabay Indonesia",
+      "publishedAt": "2026-11-24T23:43:46Z",
+      "location": null,
+      "summary": "Belum usai duka atas kematian badak Jawa, Musofa tak lama usai translokasi 7 November 2025, publik tersentak dengan wacana Hashim Djojohadikusumo, adik Presiden Prabowo Subianto sekalgus juga Utusan Khusus Presiden Bidang Iklim dan Energi. Dia mau memindahkan badak jawa (Rhinoceros sondaicus) dari…",
+      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2020/09/22044508/Badak-Jawa-Sipers-768x512.jpg",
+      "url": "https://mongabay.co.id/2026/11/24/ada-tambang-di-balik-wacana-badak-jawa-ujung-kulon-ke-alas-purwo/"
+    },
+    {
       "id": "n-b2497454fc",
       "title": "Trenggiling Masuk Pemukiman di Banjarbaru, Korban Karhutla?",
       "topic": "karhutla",
@@ -180,34 +225,49 @@
       "url": "https://mongabay.co.id/2026/11/23/trenggiling-masuk-pemukiman-di-banjarbaru-korban-karhutla/"
     },
     {
-      "id": "n-57a7b71fd5",
-      "title": "Nasib Satwa Liar Terdampak Kebakaran Hutan",
-      "topic": "karhutla",
-      "category": "Karhutla & Asap",
-      "topicSecondary": "satwa",
-      "secondaryCategory": "Satwa Terdampak",
-      "ecoLink": 1,
-      "source": "Mongabay Indonesia",
-      "publishedAt": "2026-11-18T01:59:16Z",
-      "location": null,
-      "summary": "Napas Jack terlihat begitu berat. Sesekali, orangutan berusia satu tahun itu bersin-bersin disertai lendir yang keluar dari hidung. Hasil foto sinar X yang dokter lakukan mendapati paru-paru kera besar itu kotor. “Agustus–September, asap cukup pekat dan karhutla (kebakaran hutan dan lahan) hampir…",
-      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2026/09/19111810/2-768x512.jpg",
-      "url": "https://mongabay.co.id/2026/11/18/nasib-satwa-liar-terdampak-kebakaran-hutan/"
-    },
-    {
-      "id": "n-246b68824b",
-      "title": "Wagub Sebut Sudah Tak Ada Karhutla di Papua Selatan Usai Diguyur Hujan",
+      "id": "n-c68ce72b6d",
+      "title": "Komnas HAM dorong pemulihan kesehatan korban asap karhutla",
       "topic": "karhutla",
       "category": "Karhutla & Asap",
       "topicSecondary": null,
       "secondaryCategory": null,
-      "ecoLink": 1,
+      "ecoLink": 0,
+      "source": "Antara",
+      "publishedAt": "2026-11-25T03:56:50Z",
+      "location": null,
+      "summary": "Komisi Nasional Hak Asasi Manusia (Komnas HAM) mendorong pemerintah memperkuat layanan kesehatan dan pemulihan bagi ...",
+      "image": "https://img.antaranews.com/cache/800x533/2026/10/13/1001360907.jpg",
+      "url": "https://www.antaranews.com/berita/5876683/komnas-ham-dorong-pemulihan-kesehatan-korban-asap-karhutla"
+    },
+    {
+      "id": "n-ceb9596bb7",
+      "title": "Lestari Moerdijat Ingatkan Pentingnya Kesiapan Warga Hadapi Musim Hujan",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
       "source": "Detik",
-      "publishedAt": "2026-11-17T17:15:35Z",
-      "location": "Papua Selatan",
-      "summary": "Wakil Gubernur Papua Selatan, Paskalis Imadawa, menyatakan tidak ada lagi kebakaran hutan dan lahan di daerahnya berkat hujan yang turun.",
-      "image": "https://akcdn.detik.net.id/community/media/visual/2022/05/10/paskalis-imadawa_43.jpeg?w=720&q=90",
-      "url": "https://news.detik.com/berita/d-8757665/wagub-sebut-sudah-tak-ada-karhutla-di-papua-selatan-usai-diguyur-hujan"
+      "publishedAt": "2026-11-25T02:23:49Z",
+      "location": null,
+      "summary": "BNPB mencatat 70 korban jiwa akibat banjir 2026. Rerie menekankan pentingnya kesiapsiagaan masyarakat dan perlunya rencana evakuasi inklusif.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/25/lestari-moerdijat-1795573405280.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8768731/lestari-moerdijat-ingatkan-pentingnya-kesiapan-warga-hadapi-musim-hujan"
+    },
+    {
+      "id": "n-fa308ac048",
+      "title": "Hujan Deras Picu Banjir di 3 RT Jakarta Timur, Ketinggian Air hingga 40 Cm",
+      "topic": "banjir",
+      "category": "Banjir & Longsor",
+      "topicSecondary": null,
+      "secondaryCategory": null,
+      "ecoLink": 0,
+      "source": "Detik",
+      "publishedAt": "2026-11-24T13:37:15Z",
+      "location": "DKI Jakarta",
+      "summary": "Hujan deras di DKI Jakarta menyebabkan banjir di tiga RT. BPBD DKI memantau genangan dan siaga 24 jam untuk membantu warga terdampak.",
+      "image": "https://akcdn.detik.net.id/community/media/visual/2018/11/30/66e4dd89-c4f6-4a91-9f82-f5065a953e29_169.jpeg?w=720&q=90",
+      "url": "https://news.detik.com/berita/d-8768312/hujan-deras-picu-banjir-di-3-rt-jakarta-timur-ketinggian-air-hingga-40-cm"
     },
     {
       "id": "n-182c2cdf7f",
@@ -238,21 +298,6 @@
       "summary": "Banjir merendam Kelurahan Bagan Punak, Bagasiapiapi, Rokan Hilir, Riau selama dua pekan. Sementara sekolah beralih ke pembelajaran daring.",
       "image": "https://akcdn.detik.net.id/visual/2026/01/08/belasan-hewan-ternak-di-evakuasi-akibat-terdampak-banjir-1767855949412_169.jpeg?w=720&q=90",
       "url": "https://www.cnnindonesia.com/nasional/20261124084642-20-1430664/banjir-di-bagansiapiapi-riau-2-pekan-tak-surut-sekolah-dialihkan-pjj"
-    },
-    {
-      "id": "n-6d9e3ea66e",
-      "title": "Pemkot Jakbar siapkan kolam olak dan pompa cegah banjir di Daan Mogot",
-      "topic": "banjir",
-      "category": "Banjir & Longsor",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "Antara",
-      "publishedAt": "2026-11-23T15:38:45Z",
-      "location": "DKI Jakarta",
-      "summary": "Pemerintah Kota Jakarta Barat menyiapkan kolam olak (stilling basin) serta pompa mobile untuk mengantisipasi ...",
-      "image": "https://img.antaranews.com/cache/800x533/2026/11/23/IMG_20261123_213708.jpg",
-      "url": "https://www.antaranews.com/berita/5873675/pemkot-jakbar-siapkan-kolam-olak-dan-pompa-cegah-banjir-di-daan-mogot"
     },
     {
       "id": "n-8071607d10",
@@ -375,36 +420,6 @@
       "url": "https://news.detik.com/berita/d-8764504/banjir-terjadi-di-sumut-dan-kalbar-ratusan-keluarga-terdampak"
     },
     {
-      "id": "n-2a2c999e5f",
-      "title": "Jatuh Saat Terobos Banjir, Pemotor Tewas Terbawa Arus Kali Pesanggrahan",
-      "topic": "banjir",
-      "category": "Banjir & Longsor",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "Detik",
-      "publishedAt": "2026-11-22T06:18:09Z",
-      "location": "Jawa Barat",
-      "summary": "Seorang pengendara sepeda motor bernama Kurnia Fazrullah (31) ditemukan meninggal dunia di aliran Kali Pasanggrahan, Depok, Jawa Barat (Jabar).",
-      "image": "https://akcdn.detik.net.id/community/media/visual/2026/11/22/evakuasi-pemotor-hanyut-di-kali-pesanggrahan-dokistimewa-1795328156982_169.jpeg?w=720&q=90",
-      "url": "https://news.detik.com/berita/d-8764396/jatuh-saat-terobos-banjir-pemotor-tewas-terbawa-arus-kali-pesanggrahan"
-    },
-    {
-      "id": "n-18a989a9aa",
-      "title": "Dua Daerah di Riau Tetapkan Status Siaga Bencana Banjir-Longsor",
-      "topic": "banjir",
-      "category": "Banjir & Longsor",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "CNN Indonesia",
-      "publishedAt": "2026-11-21T06:52:47Z",
-      "location": "Riau",
-      "summary": "Kabupaten Rokan Hilir dan Kota Dumai, Riau, menetapkan status siaga bencana hidrometeorologi akibat banjir dan tanah longsor. BPBD Riau akan koordinasi bantuan.",
-      "image": "https://akcdn.detik.net.id/visual/2025/01/20/jalan-lintas-sumatera-lumpuh-akibat-banjir-di-jambi-7_169.jpeg?w=720&q=90",
-      "url": "https://www.cnnindonesia.com/nasional/20261121122412-20-1429797/dua-daerah-di-riau-tetapkan-status-siaga-bencana-banjir-longsor"
-    },
-    {
       "id": "n-515e780efa",
       "title": "Lima Spesies Badak di Dunia, Mengapa Nasibnya Berbeda?",
       "topic": "satwa",
@@ -463,51 +478,6 @@
       "summary": "Jauh sebelum seluruh populasinya terisolasi di semenanjung paling barat Pulau Jawa, Rhinoceros sondaicus pernah menjelajahi rimba dataran tinggi hingga pesisir Tanah Pasundan. Berbekal penelusuran arsip kolonial, catatan perburuan masa lampau, dan data ekologi terkini, perjalanan panjang salah…",
       "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2017/09/22083414/Badak-jawa1-768x512.jpg",
       "url": "https://mongabay.co.id/specials/2026/11/dari-tanah-pasundan-ke-ujung-kulon-perjalanan-badak-jawa/"
-    },
-    {
-      "id": "n-d90d76fc4a",
-      "title": "CT ARSA, YRKB dan Koarmada Kirim 5 ton Bantuan untuk Penyintas Karhutla",
-      "topic": "karhutla",
-      "category": "Karhutla & Asap",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "CNN Indonesia",
-      "publishedAt": "2026-11-18T04:31:12Z",
-      "location": null,
-      "summary": "CT ARSA Foundation, YRKB, dan Koarmada RI mengirim 5 ton bantuan untuk penyintas karhutla di Kalimantan, termasuk kebutuhan pokok dan perlengkapan sehari-hari.",
-      "image": "https://akcdn.detik.net.id/visual/2026/11/18/ct-arsa-foundation-peduli-kemanusian-bencana-karhutla-kalimantan-1794975029976_169.jpeg?w=720&q=90",
-      "url": "https://www.cnnindonesia.com/nasional/20261118112651-20-1428443/ct-arsa-yrkb-koarmada-kirim-5-ton-bantuan-untuk-penyintas-karhutla"
-    },
-    {
-      "id": "n-44dc23c0f3",
-      "title": "Penembakan di Sindangkerta 1934, Jejak Terakhir Badak Jawa dari Priangan",
-      "topic": "satwa",
-      "category": "Satwa Terdampak",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "Mongabay Indonesia",
-      "publishedAt": "2026-11-18T02:08:14Z",
-      "location": null,
-      "summary": "Museum sejarah alam menyimpan lebih dari sekadar benda pajangan. Spesimen yang dikumpulkan hampir seabad lalu merekam ukuran tubuh dan ciri morfologi satwa dari masa ketika populasinya masih tersebar luas, sehingga menjadi pembanding bagi peneliti masa kini. Sering kali ada cerita perburuan di…",
-      "image": "https://indomgb.s3.amazonaws.com/wp-content/uploads/2018/04/22075335/Samson_TNUK-768x512.jpg",
-      "url": "https://mongabay.co.id/2026/11/18/penembakan-di-sindangkerta-1934-jejak-terakhir-badak-jawa-dari-priangan/"
-    },
-    {
-      "id": "n-d227fe0bf7",
-      "title": "Walhi Laporkan 11 Perusahaan terkait Karhutla Kalbar ke Polda",
-      "topic": "karhutla",
-      "category": "Karhutla & Asap",
-      "topicSecondary": null,
-      "secondaryCategory": null,
-      "ecoLink": 0,
-      "source": "CNN Indonesia",
-      "publishedAt": "2026-11-17T22:14:58Z",
-      "location": "Kalimantan Barat",
-      "summary": "Walhi Kalbar laporkan 11 perusahaan ke Polda terkait dugaan karhutla. Apa saja perusahaan-perusahaan yang dilaporkan?",
-      "image": "https://akcdn.detik.net.id/visual/2026/01/25/bandara-internasional-supadio-kalbar-di-kepung-karhutla-1769308318977_169.jpeg?w=720&q=90",
-      "url": "https://www.cnnindonesia.com/nasional/20261117203557-12-1428296/walhi-laporkan-11-perusahaan-terkait-karhutla-kalbar-ke-polda"
     }
   ]
 }
